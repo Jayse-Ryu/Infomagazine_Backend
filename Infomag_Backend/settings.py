@@ -40,10 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Authentication
     'rest_framework',
     'rest_framework_jwt',
     'rest_framework.authtoken',
     'corsheaders',
+
+    # Personal Apps
     'Users.apps.UsersConfig',
     'Company.apps.CompanyConfig',
     'Landing.apps.LandingConfig',
@@ -91,10 +95,13 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': 'jwt_auth_token',
     'CSFR_COOKIE': True,
     'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': timedelta(hours=2),
-    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+    'JWT_EXPIRATION_DELTA': timedelta(hours=6),
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=1),
     'JWT_PAYLOAD_HANDLER':
         'rest_framework_jwt.utils.jwt_payload_handler',
+
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER':
+        'rest_framework_jwt.utils.jwt_get_username_from_payload_handler',
 
     'JWT_PAYLOAD_GET_USER_ID_HANDLER':
         'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
@@ -141,6 +148,10 @@ DATABASES = {
         },
     }
 }
+
+# Changes the built-in user model to mine
+# AUTH_USER_MODEL = ['Users.Users']
+AUTH_USER_MODEL = 'Users.User'
 
 
 # Password validation

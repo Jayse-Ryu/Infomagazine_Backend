@@ -1,18 +1,19 @@
 from rest_framework import serializers
-from .models import Authority, Users
+from .models import User  # , Authority
 
 
-class AuthoritySerializer(serializers.ModelSerializer):
-    class Meta:
-        # Set model
-        model = Authority
-        # Set fields
-        fields = ('name', 'description')
+# class AuthoritySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         # Set model
+#         model = Authority
+#         # Set fields
+#         fields = ('name', 'description')
 
 
-class UsersSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         # 모델 설정
-        model = Users
+        model = User
         # 필드 설정
-        fields = ('account', 'name', 'organization', 'email', 'phone', 'authority', 'password', 'created_date', 'updated_date')
+        fields = ('id', 'username', 'email', 'organization', 'full_name', 'phone', 'password',
+                  'is_superuser', 'is_active', 'is_staff', 'last_login', 'created_date', 'updated_date')

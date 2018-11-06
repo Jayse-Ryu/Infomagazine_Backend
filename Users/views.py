@@ -1,13 +1,13 @@
 from rest_framework import viewsets
-from .serializers import AuthoritySerializer, UsersSerializer
-from .models import Authority, Users
+from .serializers import UserSerializer  # AuthoritySerializer
+from .models import User  # Authority
 
 
-class AuthorityViewSet(viewsets.ModelViewSet):
-    queryset = Authority.objects.all()
-    serializer_class = AuthoritySerializer
+# class AuthorityViewSet(viewsets.ModelViewSet):
+#     queryset = Authority.objects.all()
+#     serializer_class = AuthoritySerializer
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-    queryset = Users.objects.all()
-    serializer_class = UsersSerializer
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

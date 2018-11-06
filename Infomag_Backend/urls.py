@@ -5,7 +5,7 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token  # , ve
 from rest_framework import routers
 # from rest_framework.authtoken import views
 
-from Users.views import AuthorityViewSet, UsersViewSet
+from Users.views import UsersViewSet  # AuthorityViewSet
 from Company.views import CompanyViewSet
 from Landing.views import LandingViewSet
 from Files.views import FilesViewSet
@@ -13,7 +13,7 @@ from Form.views import FormViewSet
 from Preference.views import TermViewSet, UrlsViewSet
 
 router = routers.DefaultRouter()
-router.register('authority', AuthorityViewSet)
+# router.register('authority', AuthorityViewSet)
 router.register('users', UsersViewSet)
 router.register('company', CompanyViewSet)
 router.register('landing', LandingViewSet)
