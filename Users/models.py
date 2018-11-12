@@ -18,17 +18,23 @@ class UserManager(BaseUserManager):
             raise ValueError('아이디는 필수 항목입니다.')
         if not password:
             raise ValueError('비밀번호는 필수 항목입니다.')
-
+        if not full_name:
+            raise ValueError('사용자 이름은 필수 항목입니다.')
+        if not email:
+            raise ValueError('이메일은 필수 항목입니다.')
         user_obj = self.model(
             username=username,
+            full_name=full_name,
+            organization=organization,
+            phone=phone,
         )
 
         # Filled area from user
+        # user_obj.full_name = full_name
+        # user_obj.organization = organization
+        # user_obj.phone = phone
         user_obj.username = username
-        user_obj.full_name = full_name
         user_obj.email = self.normalize_email(email)
-        user_obj.organization = organization
-        user_obj.phone = phone
         user_obj.set_password(password)
 
         # Invisible fields
@@ -38,6 +44,19 @@ class UserManager(BaseUserManager):
 
         user_obj.save(using=self._db)
         return user_obj
+
+    def create_staffuser(self, username, password=None, full_name=None, organization=None, email=None, phone=None):
+        user = self.create_user(
+            username=username,
+            password=password,
+            full_name=full_name,
+            email=email,
+            organization=organization,
+            phone=phone,
+            staff=True,
+        )
+        user.save(using=self._db)
+        return user
 
     def create_superuser(self, username, password=None, full_name=None, organization=None, email=None, phone=None):
         user = self.create_user(
@@ -66,15 +85,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(
         _('first_name' + 'last_name'),
         max_length=30,
-        null=True,
-        blank=True,
         default='',
     )
     email = models.EmailField(
         _('email address'),
     )
     organization = models.CharField(
-        max_length=20,
+        max_length=50,
         null=True,
         blank=True,
     )
@@ -114,6 +131,35 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
+    def __str__(self):
+        return self.username
+
+    def get_full_name(self):
+        """
+        This method is required by Django for things like handling emails.
+        Typically this would be the user's first and last name. Since we do
+        not store the user's real name, we return their username instead.
+        """
+        if self.full_name:
+            return self.full_name
+        return self.email
+
+    def get_short_name(self):
+        """
+        This method is required by Django for things like handling emails.
+        Typically, this would be the user's first name. Since we do not store
+        the user's real name, we return their username instead.
+        """
+        if self.full_name:
+            return self.full_name
+        return self.email
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
     @property
     def token(self):
         """
@@ -124,22 +170,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         a "dynamic property".
         """
         return self._generate_jwt_token()
-
-    def get_full_name(self):
-        """
-        This method is required by Django for things like handling emails.
-        Typically this would be the user's first and last name. Since we do
-        not store the user's real name, we return their username instead.
-        """
-        return self.username
-
-    def get_short_name(self):
-        """
-        This method is required by Django for things like handling emails.
-        Typically, this would be the user's first name. Since we do not store
-        the user's real name, we return their username instead.
-        """
-        return self.username
 
     def _generate_jwt_token(self):
         """
@@ -154,3 +184,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')
+
+    # @property
+    # def is_staff(self):
+    #     return self.is_staff
+    #
+    # @property
+    # def is_admin(self):
+    #     return self.is_admin
+    #
+    # @property
+    # def is_active(self):
+    #     return self.is_active
+    #
