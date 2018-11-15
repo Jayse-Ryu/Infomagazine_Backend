@@ -17,3 +17,6 @@ class Landing(models.Model):
 
     class Meta:
         db_table = 'Landing'
+
+    def __str__(self):
+        return self.name

@@ -10,3 +10,6 @@ class Files(models.Model):
 
     class Meta:
         db_table = 'Files'
+
+    def __str__(self):
+        return self.file

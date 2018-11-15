@@ -14,6 +14,9 @@ class Term(models.Model):
     class Meta:
         db_table = 'Term'
 
+    def __str__(self):
+        return self.title
+
 
 class Urls(models.Model):
     landing_page = models.ForeignKey(Landing, on_delete=models.CASCADE)
@@ -25,3 +28,6 @@ class Urls(models.Model):
 
     class Meta:
         db_table = 'Urls'
+
+    def __str__(self):
+        return self.url

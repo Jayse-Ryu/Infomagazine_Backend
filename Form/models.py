@@ -8,3 +8,9 @@ class Form(models.Model):
     title = models.CharField(max_length=40)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'Form'
+
+    def __str__(self):
+        return self.title

@@ -17,3 +17,6 @@ class Company(models.Model):
 
     class Meta:
         db_table = 'Company'
+
+    def __str__(self):
+        return self.name
