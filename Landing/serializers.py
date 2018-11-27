@@ -5,5 +5,5 @@ from .models import Landing
 class LandingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Landing
-        fields = ('company', 'name', 'title', 'status', 'header_script', 'body_script',
+        fields = ('id', 'company', 'name', 'title', 'status', 'header_script', 'body_script',
                   'mobile_only', 'views', 'hits', 'created_date', 'updated_date')
