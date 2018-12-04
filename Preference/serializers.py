@@ -5,7 +5,7 @@ from .models import Term, Urls
 class TermSerializer(serializers.ModelSerializer):
     class Meta:
         model = Term
-        fields = ('landing_page', 'title', 'content', 'image', 'created_date', 'updated_date')
+        fields = ('landing_page', 'title', 'content', 'image', 'is_image', 'created_date', 'updated_date')
 
 
 class UrlsSerializer(serializers.ModelSerializer):

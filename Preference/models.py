@@ -8,6 +8,7 @@ class Term(models.Model):
     title = models.CharField(max_length=50)
     content = models.CharField(max_length=5000, blank=True, null=True)
     image = models.ForeignKey(Files, blank=True, null=True, on_delete=models.SET_NULL)
+    is_image = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 

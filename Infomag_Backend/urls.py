@@ -11,6 +11,7 @@ from Landing.views import LandingViewSet
 from Files.views import FilesViewSet
 from Form.views import FormViewSet
 from Preference.views import TermViewSet, UrlsViewSet
+from Collection.views import CollectionsViewSet
 
 router = routers.DefaultRouter()
 # router.register('authority', AuthorityViewSet)
@@ -21,6 +22,7 @@ router.register('files', FilesViewSet)
 router.register('form', FormViewSet)
 router.register('term', TermViewSet)
 router.register('urls', UrlsViewSet)
+router.register('collections', CollectionsViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

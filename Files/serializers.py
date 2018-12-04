@@ -7,4 +7,4 @@ class FilesSerializer(serializers.ModelSerializer):
         # 모델 설정
         model = Files
         # 필드 설정
-        fields = ('landing_page', 'file', 'created_date', 'updated_date')
+        fields = ('id', 'landing_page', 'file', 'created_date', 'updated_date')

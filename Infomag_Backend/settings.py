@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'Users.apps.UsersConfig',
     'Company.apps.CompanyConfig',
     'Landing.apps.LandingConfig',
+    'Collection.apps.CollectionConfig',
     'Files.apps.FilesConfig',
     'Form.apps.FormConfig',
     'Preference.apps.PreferenceConfig',
@@ -191,13 +192,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
