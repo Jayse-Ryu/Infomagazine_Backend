@@ -9,7 +9,7 @@ from Users.views import UsersViewSet  # AuthorityViewSet
 from Company.views import CompanyViewSet
 from Landing.views import LandingViewSet
 from Files.views import FilesViewSet
-from Form.views import FormViewSet
+from Form.views import FormViewSet, LinkViewSet
 from Preference.views import TermViewSet, UrlsViewSet
 from Collection.views import CollectionsViewSet
 
@@ -20,6 +20,7 @@ router.register('company', CompanyViewSet)
 router.register('landing', LandingViewSet)
 router.register('files', FilesViewSet)
 router.register('form', FormViewSet)
+router.register('link', LinkViewSet)
 router.register('term', TermViewSet)
 router.register('urls', UrlsViewSet)
 router.register('collections', CollectionsViewSet)

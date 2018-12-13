@@ -14,3 +14,18 @@ class Form(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Link(models.Model):
+    landing_page = models.ForeignKey(Landing, null=True, on_delete=models.CASCADE)
+    section = models.IntegerField(default=0)
+    title = models.CharField(max_length=40)
+    content = models.CharField(max_length=256)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'Link'
+
+    def __str__(self):
+        return self.title

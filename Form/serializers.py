@@ -1,10 +1,18 @@
 from rest_framework import serializers
-from .models import Form
+from .models import Form, Link
 
 
 class FormSerializer(serializers.ModelSerializer):
     class Meta:
-        # 모델 설정
+        # Set model
         model = Form
-        # 필드 설정
-        fields = ('landing_page', 'section', 'title', 'created_date', 'updated_date')
+        # Set field
+        fields = ('id', 'landing_page', 'section', 'title', 'created_date', 'updated_date')
+
+
+class LinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        # Set model
+        model = Link
+        # Set field
+        fields = ('id', 'landing_page', 'section', 'title', 'content', 'created_date', 'updated_date')
