@@ -1,8 +1,8 @@
 from rest_framework import viewsets
-from .serializers import CollectionsSerializer
-from .models import Collections
+from .models import Collection
+from .serializers import CollectionSerializer
 
 
-class CollectionsViewSet(viewsets.ModelViewSet):
-    queryset = Collections.objects.all()
-    serializer_class = CollectionsSerializer
+class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer

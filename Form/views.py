@@ -1,13 +1,13 @@
 from rest_framework import viewsets
-from .serializers import FormSerializer, LinkSerializer
-from .models import Form, Link
+from .models import FormGroup, Field
+from .serializers import FormGroupSerializer, FieldSerializer
 
 
-class FormViewSet(viewsets.ModelViewSet):
-    queryset = Form.objects.all()
-    serializer_class = FormSerializer
+class FormGroupViewSet(viewsets.ModelViewSet):
+    queryset = FormGroup.objects.all()
+    serializer_class = FormGroupSerializer
 
 
-class LinkViewSet(viewsets.ModelViewSet):
-    queryset = Link.objects.all()
-    serializer_class = LinkSerializer
+class FieldViewSet(viewsets.ModelViewSet):
+    queryset = Field.objects.all()
+    serializer_class = FieldSerializer

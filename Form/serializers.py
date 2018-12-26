@@ -1,18 +1,28 @@
 from rest_framework import serializers
-from .models import Form, Link
+from .models import FormGroup, Field
+import json
 
 
-class FormSerializer(serializers.ModelSerializer):
+class JsonSerializer(serializers.JSONField):
+    fields = json.encoder
+
+
+class ListSerializer(serializers.ListField):
+    list = list
+
+
+class FormGroupSerializer(serializers.ModelSerializer):
+    fields = JsonSerializer()
+
     class Meta:
-        # Set model
-        model = Form
-        # Set field
-        fields = ('id', 'landing_page', 'section', 'title', 'created_date', 'updated_date')
+        model = FormGroup
+        fields = ('id', 'landing', 'name', 'back_color', 'text_color', 'fields', 'created_date', 'updated_date')
 
 
-class LinkSerializer(serializers.ModelSerializer):
+class FieldSerializer(serializers.ModelSerializer):
+    list = ListSerializer()
+
     class Meta:
-        # Set model
-        model = Link
-        # Set field
-        fields = ('id', 'landing_page', 'section', 'title', 'content', 'created_date', 'updated_date')
+        model = Field
+        fields = ('id', 'form_group', 'type', 'name', 'holder', 'value', 'url', 'list', 'width',
+                  'back_color', 'text_color', 'image', 'created_date', 'updated_date')

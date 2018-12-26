@@ -8,4 +8,4 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         # 필드 설정
         fields = ('id', 'manager', 'name', 'sub_name', 'header', 'address', 'corp_num', 'phone',
-                  'email', 'description', 'created_date', 'updated_date')
+                  'email', 'desc', 'created_date', 'updated_date')

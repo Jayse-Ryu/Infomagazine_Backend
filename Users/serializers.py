@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         # Field set
         fields = (
             'id',
-            'username',
+            'account',
             'email',
             'organization',
             'full_name',
@@ -18,6 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser',
             'is_active',
             'is_staff',
+            'is_guest',
+            'guest_company',
             'last_login',
             'created_date',
             'updated_date'

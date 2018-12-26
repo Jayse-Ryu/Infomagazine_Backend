@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import Files
+from .models import Image
 
 
-class FilesSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         # 모델 설정
-        model = Files
+        model = Image
         # 필드 설정
-        fields = ('id', 'landing_page', 'file', 'created_date', 'updated_date')
+        fields = ('id', 'landing', 'image', 'created_date')

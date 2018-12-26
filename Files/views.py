@@ -1,8 +1,8 @@
 from rest_framework import viewsets
-from .serializers import FilesSerializer
-from .models import Files
+from .serializers import ImageSerializer
+from .models import Image
 
 
-class FilesViewSet(viewsets.ModelViewSet):
-    queryset = Files.objects.all()
-    serializer_class = FilesSerializer
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer

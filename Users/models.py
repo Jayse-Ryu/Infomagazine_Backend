@@ -1,4 +1,5 @@
 from django.db import models
+from Company.models import Company
 
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -12,9 +13,9 @@ import jwt
 
 # Abstracted User manager.
 class UserManager(BaseUserManager):
-    def create_user(self, username, password=None, full_name=None, organization=None,
+    def create_user(self, account, password=None, full_name=None, organization=None,
                     email=None, phone=None, admin=False, staff=False, active=True):
-        if not username:
+        if not account:
             raise ValueError('아이디는 필수 항목입니다.')
         if not password:
             raise ValueError('비밀번호는 필수 항목입니다.')
@@ -23,7 +24,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('이메일은 필수 항목입니다.')
         user_obj = self.model(
-            username=username,
+            account=account,
             full_name=full_name,
             organization=organization,
             phone=phone,
@@ -33,7 +34,7 @@ class UserManager(BaseUserManager):
         # user_obj.full_name = full_name
         # user_obj.organization = organization
         # user_obj.phone = phone
-        user_obj.username = username
+        user_obj.account = account
         user_obj.email = self.normalize_email(email)
         user_obj.set_password(password)
 
@@ -45,9 +46,9 @@ class UserManager(BaseUserManager):
         user_obj.save(using=self._db)
         return user_obj
 
-    def create_staffuser(self, username, password=None, full_name=None, organization=None, email=None, phone=None):
+    def create_staffuser(self, account, password=None, full_name=None, organization=None, email=None, phone=None):
         user = self.create_user(
-            username=username,
+            account=account,
             password=password,
             full_name=full_name,
             email=email,
@@ -58,9 +59,9 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password=None, full_name=None, organization=None, email=None, phone=None):
+    def create_superuser(self, account, password=None, full_name=None, organization=None, email=None, phone=None):
         user = self.create_user(
-            username=username,
+            account=account,
             password=password,
             full_name=full_name,
             email=email,
@@ -75,7 +76,7 @@ class UserManager(BaseUserManager):
 
 # Abstracted User fields with options
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(
+    account = models.CharField(
         max_length=20,
         null=False,
         blank=False,
@@ -85,6 +86,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(
         _('first_name' + 'last_name'),
         max_length=30,
+        blank=True,
         default='',
     )
     email = models.EmailField(
@@ -108,6 +110,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         _('is_active'),
         default=True,
     )
+    is_guest = models.BooleanField(
+        default=True,
+    )
+    guest_company = models.ForeignKey(
+        Company,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     created_date = models.DateTimeField(
         _('date joined'),
         auto_now_add=True,
@@ -121,18 +132,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     # objects = BaseUserManager()
 
     # This field will be the 'username'
-    USERNAME_FIELD = 'username'
+    # USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'account'
     # USERNAME_FIELD = 'account'
     # Required for create user (without username, password)
     REQUIRED_FIELDS = ['full_name', 'email', 'organization', 'phone']
 
     class Meta:
-        db_table = 'Users'
+        db_table = 'user'
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return self.username
+        return self.account
 
     def get_full_name(self):
         """
@@ -185,6 +197,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return token.decode('utf-8')
 
+    # Study property first
     # @property
     # def is_staff(self):
     #     return self.is_staff

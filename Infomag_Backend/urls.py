@@ -5,25 +5,26 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token  # , ve
 from rest_framework import routers
 # from rest_framework.authtoken import views
 
-from Users.views import UsersViewSet  # AuthorityViewSet
+from Users.views import UserViewSet  # AuthorityViewSet
 from Company.views import CompanyViewSet
-from Landing.views import LandingViewSet
-from Files.views import FilesViewSet
-from Form.views import FormViewSet, LinkViewSet
-from Preference.views import TermViewSet, UrlsViewSet
-from Collection.views import CollectionsViewSet
+from Landing.views import LandingViewSet, LayoutViewSet
+from Files.views import ImageViewSet
+from Form.views import FormGroupViewSet, FieldViewSet
+from Preference.views import TermViewSet, UrlViewSet
+from Collection.views import CollectionViewSet
 
 router = routers.DefaultRouter()
 # router.register('authority', AuthorityViewSet)
-router.register('users', UsersViewSet)
+router.register('user', UserViewSet)
 router.register('company', CompanyViewSet)
 router.register('landing', LandingViewSet)
-router.register('files', FilesViewSet)
-router.register('form', FormViewSet)
-router.register('link', LinkViewSet)
+router.register('layout', LayoutViewSet)
+router.register('image', ImageViewSet)
+router.register('form_group', FormGroupViewSet)
+router.register('field', FieldViewSet)
 router.register('term', TermViewSet)
-router.register('urls', UrlsViewSet)
-router.register('collections', CollectionsViewSet)
+router.register('urls', UrlViewSet)
+router.register('collection', CollectionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

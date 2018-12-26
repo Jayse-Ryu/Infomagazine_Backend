@@ -28,7 +28,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
+# ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
+ALLOWED_HOSTS = '*'
 
 
 # Application definition
@@ -77,6 +78,7 @@ CORS_ORIGIN_REGEX_WHITELIST = tuple(config('CORS_ORIGIN_REGEX_WHITELIST', cast=C
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
+        # Issued with sign up
         # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
         'rest_framework.permissions.AllowAny',
     ),
@@ -97,8 +99,8 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': 'jwt_auth_token',
     'CSFR_COOKIE': True,
     'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': timedelta(hours=6),
-    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=1),
+    'JWT_EXPIRATION_DELTA': timedelta(hours=9),
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=5),
     'JWT_PAYLOAD_HANDLER':
         'rest_framework_jwt.utils.jwt_payload_handler',
 

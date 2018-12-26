@@ -1,15 +1,17 @@
 from rest_framework import serializers
-from .models import Collections
+from .models import Collection
+import json
 
 
-class CollectionsSerializer(serializers.ModelSerializer):
-    data = serializers.ListField(
-        required=True,
-        child=serializers.CharField(allow_blank=True)
-    )
+class DataSerializer(serializers.JSONField):
+    data = json.encoder
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+    data = DataSerializer()
 
     class Meta:
         # 모델 설정
-        model = Collections
+        model = Collection
         # 필드 설정
-        fields = ('id', 'landing_page', 'data', 'created_date', 'updated_date')
+        fields = ('id', 'landing', 'data', 'url', 'form_group', 'created_date', 'updated_date')
