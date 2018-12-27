@@ -27,7 +27,7 @@ router.register('video', VideoViewSet)
 router.register('form_group', FormGroupViewSet)
 router.register('field', FieldViewSet)
 router.register('term', TermViewSet)
-router.register('urls', UrlViewSet)
+router.register('url', UrlViewSet)
 router.register('collection', CollectionViewSet)
 
 urlpatterns = [

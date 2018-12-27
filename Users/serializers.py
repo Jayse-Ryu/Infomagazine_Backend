@@ -19,7 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
             'is_active',
             'is_staff',
             'is_guest',
-            'guest_company',
             'last_login',
             'created_date',
             'updated_date'
