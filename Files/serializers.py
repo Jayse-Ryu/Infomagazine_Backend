@@ -7,4 +7,4 @@ class ImageSerializer(serializers.ModelSerializer):
         # 모델 설정
         model = Image
         # 필드 설정
-        fields = ('id', 'landing', 'image', 'created_date')
+        fields = ('id', 'layout', 'type', 'url', 'desc', 'created_date', 'updated_date')

@@ -1,5 +1,4 @@
 from django.db import models
-from Company.models import Company
 
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -113,12 +112,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_guest = models.BooleanField(
         default=True,
     )
-    guest_company = models.ForeignKey(
-        Company,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
     created_date = models.DateTimeField(
         _('date joined'),
         auto_now_add=True,
@@ -132,7 +125,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     # objects = BaseUserManager()
 
     # This field will be the 'username'
-    # USERNAME_FIELD = 'username'
     USERNAME_FIELD = 'account'
     # USERNAME_FIELD = 'account'
     # Required for create user (without username, password)

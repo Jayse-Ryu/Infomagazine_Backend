@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .serializers import CompanySerializer
-from .models import Company
+from .models import Company  # , GuestFilter
+from .serializers import CompanySerializer  # , GuestFilterSerializer
 
 
 class CompanyViewSet(viewsets.ModelViewSet):

@@ -55,7 +55,10 @@ INSTALLED_APPS = [
     'Collection.apps.CollectionConfig',
     'Files.apps.FilesConfig',
     'Form.apps.FormConfig',
-    'Preference.apps.PreferenceConfig',
+    'Guest.apps.GuestConfig',
+    'Term.apps.TermConfig',
+    'Url.apps.UrlConfig',
+    'Video.apps.VideoConfig',
 ]
 
 MIDDLEWARE = [

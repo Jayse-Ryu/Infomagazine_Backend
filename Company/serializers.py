@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Company
+from .models import Company  # , GuestFilter
 
 
 class CompanySerializer(serializers.ModelSerializer):

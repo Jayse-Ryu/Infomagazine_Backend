@@ -1,11 +1,5 @@
 from rest_framework import serializers
-from .models import Term, Url
-
-
-class TermSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Term
-        fields = ('id', 'landing', 'title', 'content', 'image', 'created_date', 'updated_date')
+from .models import Url
 
 
 class UrlSerializer(serializers.ModelSerializer):
