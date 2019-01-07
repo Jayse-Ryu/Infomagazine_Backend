@@ -3,9 +3,12 @@ from .models import Company  # , GuestFilter
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    manager_name = serializers.SerializerMethodField()
+
+    def get_manager_name(self, obj):
+        return str(obj.manager.full_name)
+
     class Meta:
-        # 모델 설정
         model = Company
-        # 필드 설정
-        fields = ('id', 'manager', 'name', 'sub_name', 'header', 'address', 'corp_num', 'phone',
+        fields = ('id', 'manager', 'manager_name', 'name', 'sub_name', 'header', 'address', 'corp_num', 'phone',
                   'email', 'desc', 'created_date', 'updated_date')

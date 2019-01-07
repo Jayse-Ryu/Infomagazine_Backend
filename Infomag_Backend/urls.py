@@ -17,10 +17,11 @@ from Url.views import UrlViewSet
 from Collection.views import CollectionViewSet
 
 router = routers.DefaultRouter()
-router.register('user', UserViewSet)
+# router.register('user', UserViewSet)
+router.register('user', UserViewSet, base_name='user')
 router.register('guest_filter', GuestFilterViewSet)
-router.register('company', CompanyViewSet)
-router.register('landing', LandingViewSet)
+router.register('company', CompanyViewSet, base_name='company')
+router.register('landing', LandingViewSet, base_name='landing')
 router.register('layout', LayoutViewSet)
 router.register('image', ImageViewSet)
 router.register('video', VideoViewSet)
@@ -28,7 +29,7 @@ router.register('form_group', FormGroupViewSet)
 router.register('field', FieldViewSet)
 router.register('term', TermViewSet)
 router.register('url', UrlViewSet)
-router.register('collection', CollectionViewSet)
+router.register('collection', CollectionViewSet, base_name='collection')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
