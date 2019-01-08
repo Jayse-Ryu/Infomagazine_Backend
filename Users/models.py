@@ -13,7 +13,7 @@ import jwt
 # Abstracted User manager.
 class UserManager(BaseUserManager):
     def create_user(self, account, password=None, full_name=None, organization=None,
-                    email=None, phone=None, admin=False, staff=False, active=True):
+                    email=None, phone=None, admin=False, staff=False, active=True, is_guest=True):
         if not account:
             raise ValueError('아이디는 필수 항목입니다.')
         if not password:
@@ -54,6 +54,7 @@ class UserManager(BaseUserManager):
             organization=organization,
             phone=phone,
             staff=True,
+            is_guest=False,
         )
         user.save(using=self._db)
         return user
@@ -68,6 +69,7 @@ class UserManager(BaseUserManager):
             phone=phone,
             staff=True,
             admin=True,
+            is_guest=False,
         )
         user.save(using=self._db)
         return user

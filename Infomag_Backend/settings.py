@@ -35,6 +35,7 @@ ALLOWED_HOSTS = '*'
 # Application definition
 
 INSTALLED_APPS = [
+    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Authentication
+    # REST Framework
     'rest_framework',
     'rest_framework_jwt',
     'rest_framework.authtoken',
@@ -97,7 +98,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 5
 }
 
 JWT_AUTH = {
