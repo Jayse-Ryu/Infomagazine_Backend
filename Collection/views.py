@@ -4,7 +4,7 @@ from .models import Collection
 from .serializers import CollectionSerializer
 # from django.db.models import Q
 from django.utils import timezone
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 
 class CollectionViewSet(mixins.CreateModelMixin,
@@ -31,54 +31,90 @@ class CollectionViewSet(mixins.CreateModelMixin,
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        # Filter needed (Landing_id = int(filter), Form_group = int(order), Datetime = datetime(filter))
+        # Filter needed
+        # Landing_id = int,
+        # Form_group = int,
+        # Quick_filter = datetime,
+        # Datetime = datetime,
 
-        # ex) 2019-01-08 18:09:27.759556
+        # Landing id filter
+        landing = self.request.query_params.get('landing', None)
+        if landing is not None:
+            print('Landing id is? ', landing)
+            queryset = queryset.filter(landing_id=landing)
+
+        # Form group filter
+        form = self.request.query_params.get('form', None)
+        if form is not None:
+            print('Form id is? ', form)
+            queryset = queryset.filter(form_group_id=form)
+
+        # Quick date filtered
         quick = self.request.query_params.get('quick', None)
-        print('quick')
-        if quick in 'lastmonth':
-            first_day_of_current_month = timezone.now().replace(day=1)
-            last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
-            calc_year = last_day_of_previous_month.year
-            calc_month = last_day_of_previous_month.month
-            calc_day = last_day_of_previous_month.day
-            print('Last month result', calc_year, calc_month, calc_day)
-            queryset = queryset.filter(created_date__gte=date(calc_year, calc_month, 1),
-                                       created_date__lte=date(calc_year, calc_month, calc_day))
-        elif quick in 'thismonth':
-            last_day_of_current_month = (timezone.now().replace(day=1) + timedelta(days=32))\
-                                            .replace(day=1) - timedelta(days=1)
-            calc_year = last_day_of_current_month.year
-            calc_month = last_day_of_current_month.month
-            calc_day = last_day_of_current_month.day
-            print('The last day of this month result', calc_year, calc_month, calc_day)
-            queryset = queryset.filter(created_date__gte=date(calc_year, calc_month, 1),
-                                       created_date__lte=date(calc_year, calc_month, calc_day))
-        elif quick in 'recent3':
-            now = timezone.now()
-            delta = timedelta(days=3)
-            calc_date = (now - delta)
-            print('Recent 3 days date', calc_date)
-            queryset = queryset.filter(created_date__gte=calc_date,
-                                       created_date__lt=date(now.year, now.month, now.day))
-        elif quick in 'recent2':
-            now = timezone.now()
-            delta = timedelta(days=2)
-            calc_date = (now - delta)
-            print('Recent 2 days date', calc_date)
-            queryset = queryset.filter(created_date__gte=calc_date,
-                                       created_date__lt=date(now.year, now.month, now.day))
-        elif quick in 'yesterday':
-            now = timezone.now()
-            delta = timedelta(days=1)
-            calc_date = (now - delta)
-            print('Yesterday is ', calc_date)
-            queryset = queryset.filter(created_date__gte=calc_date,
-                                       created_date__lt=date(now.year, now.month, now.day))
-        elif quick in 'today':
-            now = timezone.now()
-            print('Get today date ', now)
-            queryset = queryset.filter(created_date__gte=date(now.year, now.month, now.day))
+        if quick is not None:
+            if quick in 'lastmonth':
+                first_day_of_current_month = timezone.now().replace(day=1)
+                last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+                calc_year = last_day_of_previous_month.year
+                calc_month = last_day_of_previous_month.month
+                calc_day = last_day_of_previous_month.day
+                print('Last month result', calc_year, calc_month, calc_day)
+                queryset = queryset.filter(created_date__gte=date(calc_year, calc_month, 1),
+                                           created_date__lte=date(calc_year, calc_month, calc_day))
+            elif quick in 'thismonth':
+                last_day_of_current_month = (timezone.now().replace(day=1) + timedelta(days=32))\
+                                                .replace(day=1) - timedelta(days=1)
+                calc_year = last_day_of_current_month.year
+                calc_month = last_day_of_current_month.month
+                calc_day = last_day_of_current_month.day
+                print('The last day of this month result', calc_year, calc_month, calc_day)
+                queryset = queryset.filter(created_date__gte=date(calc_year, calc_month, 1),
+                                           created_date__lte=date(calc_year, calc_month, calc_day))
+            elif quick in 'recent3':
+                now = timezone.now()
+                delta = timedelta(days=3)
+                calc_date = (now - delta)
+                print('Recent 3 days date', calc_date)
+                queryset = queryset.filter(created_date__gte=calc_date,
+                                           created_date__lt=date(now.year, now.month, now.day))
+            elif quick in 'recent2':
+                now = timezone.now()
+                delta = timedelta(days=2)
+                calc_date = (now - delta)
+                print('Recent 2 days date', calc_date)
+                queryset = queryset.filter(created_date__gte=calc_date,
+                                           created_date__lt=date(now.year, now.month, now.day))
+            elif quick in 'yesterday':
+                now = timezone.now()
+                delta = timedelta(days=1)
+                calc_date = (now - delta)
+                print('Yesterday is ', calc_date)
+                queryset = queryset.filter(created_date__gte=calc_date,
+                                           created_date__lt=date(now.year, now.month, now.day))
+            elif quick in 'today':
+                now = timezone.now()
+                print('Get today date ', now)
+                queryset = queryset.filter(created_date__gte=date(now.year, now.month, now.day))
+
+        # Get date picker filter
+        # ex) 2019-01-08(T18:09:27.759556)
+        start = self.request.query_params.get('start', None)
+        end = self.request.query_params.get('end', None)
+        if start is not None:
+            try:
+                datetime.strptime(start, '%Y-%m-%d')
+                if end is not None:
+                    try:
+                        datetime.strptime(end, '%Y-%m-%d')
+                        print('Date picker filtered')
+                        print('Start date? ', start[:4], start[5:7], start[8:])
+                        print('End date? ', end[:4], end[5:7], end[8:])
+                        queryset = queryset.filter(created_date__gte=date(int(start[:4]), int(start[5:7]), int(start[8:])),
+                                                   created_date__lte=date(int(end[:4]), int(end[5:7]), int(end[8:])))
+                    except ValueError:
+                        raise ValueError("Incorrect data format, 'End' should be YYYY-MM-DD")
+            except ValueError:
+                raise ValueError("Incorrect data format, 'Start' should be YYYY-MM-DD")
 
         page = self.paginate_queryset(queryset)
         if page is not None:
