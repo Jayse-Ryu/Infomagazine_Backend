@@ -1,4 +1,5 @@
 from rest_framework import viewsets, mixins
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from .serializers import LandingSerializer, LayoutSerializer
 from .models import Landing, Layout
@@ -14,11 +15,9 @@ class LandingViewSet(mixins.CreateModelMixin,
     serializer_class = LandingSerializer
     lookup_field = 'id'
     # print('Basic view queryset = ', queryset)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def create(self, request, *args, **kwargs):
-        # print('Create request = ', request)
-        # print('Create args = ', args)
-        # print('Create kwargs = ', kwargs)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -26,31 +25,25 @@ class LandingViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, headers=headers)
 
     def list(self, request, *args, **kwargs):
-        # print('List request = ', request)
-        # print('List args = ', args)
-        # print('List args = ', kwargs)
         queryset = self.filter_queryset(self.get_queryset())
 
+        # (name = str, company = str, manager = str,)
         # If list searched as landing page name
         name = self.request.query_params.get('name', None)
-        print('name catched? ', name)
         if name is not None:
             queryset = queryset.filter(name__icontains=name)
-            print('name query catched? ', queryset)
 
         # If list searched as company name
         company = self.request.query_params.get('company', None)
-        print('company name arg ', company)
         if company is not None:
             queryset = queryset.filter(company__name__icontains=company)
-            print('company query ', queryset)
 
         # If list searched as manager name
         manager = self.request.query_params.get('manager', None)
         if manager is not None:
             queryset = queryset.filter(manager__full_name__icontains=manager)
-            print('manager query ', queryset)
 
+        # Pagination
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

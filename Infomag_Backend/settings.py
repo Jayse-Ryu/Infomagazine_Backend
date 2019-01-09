@@ -83,8 +83,8 @@ CORS_ORIGIN_REGEX_WHITELIST = tuple(config('CORS_ORIGIN_REGEX_WHITELIST', cast=C
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         # Issued with sign up
-        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        # 'rest_framework.permissions.AllowAny',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework.renderers.MultiPartRenderer',

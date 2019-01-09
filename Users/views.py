@@ -1,4 +1,5 @@
 from rest_framework import viewsets, mixins
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .serializers import UserSerializer
 from .models import User
@@ -13,23 +14,30 @@ class UserViewSet(mixins.CreateModelMixin,
     queryset = User.objects.all().order_by('-created_date')
     serializer_class = UserSerializer
     lookup_field = 'id'
-    # print('Basic view queryset = ', queryset)
 
     def create(self, request, *args, **kwargs):
-        # print('Create request = ', request)
-        # print('Create args = ', args)
-        # print('Create kwargs = ', kwargs)
+        # Need fix
+        permission_classes = (AllowAny,)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+
         return Response(serializer.data, headers=headers)
 
     def list(self, request, *args, **kwargs):
-        # print('List request = ', request)
-        # print('List args = ', args)
-        # print('List args = ', kwargs)
         queryset = self.filter_queryset(self.get_queryset())
+
+        # (name = str, admin = anything,)
+        # If list searched as user name
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(full_name__icontains=name)
+
+        admin = self.request.query_params.get('admin', None)
+        if admin is not None:
+            queryset = queryset.all().order_by('-is_staff')
 
         page = self.paginate_queryset(queryset)
         if page is not None:

@@ -1,5 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
+from django.db.models import Q
 from .models import Company
 from .serializers import CompanySerializer
 
@@ -16,9 +17,6 @@ class CompanyViewSet(mixins.CreateModelMixin,
     # print('Basic view queryset = ', queryset)
 
     def create(self, request, *args, **kwargs):
-        # print('Create request = ', request)
-        # print('Create args = ', args)
-        # print('Create kwargs = ', kwargs)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -26,10 +24,18 @@ class CompanyViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, headers=headers)
 
     def list(self, request, *args, **kwargs):
-        # print('List request = ', request)
-        # print('List args = ', args)
-        # print('List args = ', kwargs)
         queryset = self.filter_queryset(self.get_queryset())
+
+        # (name = str, manager = str,)
+        # If list searched as company name or sub_name
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(Q(name__icontains=name) | Q(sub_name__icontains=name))
+
+        # If list searched as manager name
+        manager = self.request.query_params.get('manager', None)
+        if manager is not None:
+            queryset = queryset.filter(manager__full_name__icontains=manager)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -40,9 +46,6 @@ class CompanyViewSet(mixins.CreateModelMixin,
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        # print('Retrieve request = ', request)
-        # print('Retrieve args = ', args)
-        # print('Retrieve kwargs = ', kwargs)
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
