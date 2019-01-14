@@ -3,10 +3,13 @@ from .models import Company  # , GuestFilter
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    manager_name = serializers.SerializerMethodField()
+    manager_name = serializers.SerializerMethodField(required=False, default='비어있음')
 
     def get_manager_name(self, obj):
-        return str(obj.manager.full_name)
+        if obj.manager is not None:
+            return str(obj.manager.full_name)
+        else:
+            return '비어있음'
 
     class Meta:
         model = Company

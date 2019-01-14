@@ -9,14 +9,20 @@ class OrderSerializer(serializers.JSONField):
 
 class LandingSerializer(serializers.ModelSerializer):
 
-    company_name = serializers.SerializerMethodField()
-    manager_name = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField(required=False, default='비어있음')
+    manager_name = serializers.SerializerMethodField(required=False, default='비어있음')
 
     def get_company_name(self, obj):
-        return str(obj.company.name)
+        if obj.company is not None:
+            return str(obj.company.name)
+        else:
+            return '비어있음'
 
     def get_manager_name(self, obj):
-        return str(obj.manager.full_name)
+        if obj.manager is not None:
+            return str(obj.manager.full_name)
+        else:
+            return '비어있음'
 
     class Meta:
         model = Landing

@@ -66,6 +66,18 @@ class UserViewSet(mixins.CreateModelMixin,
         self.perform_update(serializer)
         return Response(serializer.data)
 
+    def partial_update(self, request, *args, **kwargs):
+        print('Patch request = ', request)
+        print('Patch args = ', args)
+        print('Patch kwargs = ', kwargs)
+        # kwargs['full_name'] = True
+        kwargs['partial'] = True
+        # if kwargs['password'] is None:
+        #     print('Password is none')
+        # else:
+        #     print('Password something in there')
+        return self.update(request, *args, **kwargs)
+
     def perform_destroy(self, instance):
         # print('Delete instance = ', instance)
         instance.delete()
