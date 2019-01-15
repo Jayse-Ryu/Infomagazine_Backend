@@ -30,7 +30,7 @@ class Landing(models.Model):
 
 class Layout(models.Model):
     landing = models.ForeignKey(Landing, on_delete=models.CASCADE)
-    order = models.CharField(max_length=3000, blank=True, null=True)
+    # order = models.CharField(max_length=3000, blank=True, null=True)
     is_banner = models.BooleanField(default=False)
     banner_url = models.CharField(max_length=1000, null=True, blank=True)
     banner_image = models.ForeignKey(Image, blank=True, null=True, on_delete=models.SET_NULL)
@@ -46,4 +46,7 @@ class Layout(models.Model):
         db_table = 'layout'
 
     def __str__(self):
-        return self.id
+        # return str(self.created_date) or ''
+        if self.landing == None:
+            return "ERROR-LANDING NAME IS NULL"
+        return str(self.landing)

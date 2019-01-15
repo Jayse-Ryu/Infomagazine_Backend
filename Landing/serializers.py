@@ -3,8 +3,8 @@ from .models import Landing, Layout
 import json
 
 
-class OrderSerializer(serializers.JSONField):
-    order = json.encoder
+# class OrderSerializer(serializers.JSONField):
+#     order = json.encoder
 
 
 class LandingSerializer(serializers.ModelSerializer):
@@ -34,9 +34,9 @@ class LandingSerializer(serializers.ModelSerializer):
 
 
 class LayoutSerializer(serializers.ModelSerializer):
-    order = OrderSerializer()
+    # order = OrderSerializer()
 
     class Meta:
         model = Layout
-        fields = ('id', 'landing', 'order', 'is_banner', 'banner_url', 'banner_url', 'banner_image',
+        fields = ('id', 'landing', 'is_banner', 'banner_url', 'banner_url', 'banner_image',
                   'inner_db', 'font', 'is_term', 'image_term', 'show_company', 'created_date', 'updated_date')

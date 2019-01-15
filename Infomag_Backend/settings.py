@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'Term.apps.TermConfig',
     'Url.apps.UrlConfig',
     'Video.apps.VideoConfig',
+    'Order.apps.OrderConfig',
 ]
 
 MIDDLEWARE = [
