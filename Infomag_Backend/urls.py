@@ -32,7 +32,7 @@ router.register('term', TermViewSet)
 router.register('url', UrlViewSet)
 router.register('collection', CollectionViewSet, base_name='collection')
 router.register('order', OrderViewSet, base_name='order')
-router.register('order', OrganizationViewSet, base_name='organization')
+router.register('organization', OrganizationViewSet, base_name='organization')
 router.register('user_access', UserAccessViewSet, base_name='user_access')
 
 urlpatterns = [

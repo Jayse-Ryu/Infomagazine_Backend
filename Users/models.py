@@ -73,7 +73,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-# Abstracted User fields with options
+# Abstracted User fields with options (AbstractBaseUser, PermissionsMixin)
 class User(AbstractBaseUser, PermissionsMixin):
     account = models.CharField(
         max_length=20,
@@ -126,6 +126,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         db_table = 'user'
         verbose_name = _('user')
         verbose_name_plural = _('users')
+        # abstract = True
 
     def __str__(self):
         return self.account
