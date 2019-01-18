@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 from decouple import config, Csv
+import csv
 from datetime import timedelta
 
 
@@ -56,23 +57,23 @@ INSTALLED_APPS = [
     'Collection.apps.CollectionConfig',
     'Files.apps.FilesConfig',
     'Form.apps.FormConfig',
-    'Guest.apps.GuestConfig',
     'Term.apps.TermConfig',
     'Url.apps.UrlConfig',
     'Video.apps.VideoConfig',
     'Order.apps.OrderConfig',
+    'Organization.apps.OrganizationConfig',
+    'UserAccess.apps.UseraccessConfig',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = config('CORS_ORIGIN_ALLOW_ALL', cast=bool)

@@ -12,7 +12,7 @@ import jwt
 
 # Abstracted User manager.
 class UserManager(BaseUserManager):
-    def create_user(self, account, password=None, full_name=None, organization=None,
+    def create_user(self, account, password=None, full_name=None,
                     email=None, phone=None, admin=False, staff=False, active=True, is_guest=True):
         if not account:
             raise ValueError('아이디는 필수 항목입니다.')
@@ -25,7 +25,6 @@ class UserManager(BaseUserManager):
         user_obj = self.model(
             account=account,
             full_name=full_name,
-            organization=organization,
             phone=phone,
         )
 
@@ -41,17 +40,17 @@ class UserManager(BaseUserManager):
         user_obj.is_superuser = admin
         user_obj.is_staff = staff
         user_obj.is_active = active
+        user_obj.is_guest = is_guest
 
         user_obj.save(using=self._db)
         return user_obj
 
-    def create_staffuser(self, account, password=None, full_name=None, organization=None, email=None, phone=None):
+    def create_staffuser(self, account, password=None, full_name=None, email=None, phone=None):
         user = self.create_user(
             account=account,
             password=password,
             full_name=full_name,
             email=email,
-            organization=organization,
             phone=phone,
             staff=True,
             is_guest=False,
@@ -59,13 +58,12 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, account, password=None, full_name=None, organization=None, email=None, phone=None):
+    def create_superuser(self, account, password=None, full_name=None, email=None, phone=None):
         user = self.create_user(
             account=account,
             password=password,
             full_name=full_name,
             email=email,
-            organization=organization,
             phone=phone,
             staff=True,
             admin=True,
@@ -93,11 +91,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         _('email address'),
     )
-    organization = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-    )
     phone = models.CharField(
         max_length=16,
         null=True,
@@ -109,9 +102,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     is_active = models.BooleanField(
         _('is_active'),
-        default=True,
-    )
-    is_guest = models.BooleanField(
         default=True,
     )
     created_date = models.DateTimeField(
@@ -130,7 +120,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'account'
     # USERNAME_FIELD = 'account'
     # Required for create user (without username, password)
-    REQUIRED_FIELDS = ['full_name', 'email', 'organization', 'phone']
+    REQUIRED_FIELDS = ['full_name', 'email', 'phone']
 
     class Meta:
         db_table = 'user'

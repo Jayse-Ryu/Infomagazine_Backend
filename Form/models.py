@@ -5,7 +5,7 @@ from Files.models import Image
 
 class FormGroup(models.Model):
     landing = models.ForeignKey(Landing, null=True, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, default='', blank=True)
     back_color = models.CharField(max_length=7, default='', blank=True)
     text_color = models.CharField(max_length=7, default='', blank=True)
     fields = models.CharField(max_length=100, blank=True, null=True)
@@ -20,9 +20,9 @@ class FormGroup(models.Model):
 
 
 class Field(models.Model):
-    form_group = models.ForeignKey(FormGroup, on_delete=models.CASCADE)
+    form_group = models.ForeignKey(FormGroup, null=True, on_delete=models.CASCADE)
     type = models.IntegerField(default=0)
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=10, default='', blank=True)
     holder = models.CharField(max_length=50, blank=True)
     value = models.CharField(max_length=50, blank=True, null=True)
     url = models.CharField(max_length=1000, blank=True, null=True)

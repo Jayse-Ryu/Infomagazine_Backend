@@ -1,20 +1,20 @@
 from rest_framework import viewsets, mixins
-# from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from .serializers import OrderSerializer
-from .models import Order
+from django.db.models import Q
+from .models import Organization
+from .serializers import OrganizationSerializer
 
 
-class OrderViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
-    queryset = Order.objects.all().order_by('position')
-    serializer_class = OrderSerializer
+class OrganizationViewSet(mixins.CreateModelMixin,
+                          mixins.ListModelMixin,
+                          mixins.RetrieveModelMixin,
+                          mixins.UpdateModelMixin,
+                          mixins.DestroyModelMixin,
+                          viewsets.GenericViewSet):
+    queryset = Organization.objects.all().order_by('-created_date')
+    serializer_class = OrganizationSerializer
     lookup_field = 'id'
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
+    # print('Basic view queryset = ', queryset)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -26,7 +26,17 @@ class OrderViewSet(mixins.CreateModelMixin,
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        # Pagination
+        # (name = str, manager = str,)
+        # If list searched as company name or sub_name
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(Q(name__icontains=name) | Q(sub_name__icontains=name))
+
+        # If list searched as manager name
+        manager = self.request.query_params.get('manager', None)
+        if manager is not None:
+            queryset = queryset.filter(manager__full_name__icontains=manager)
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -36,9 +46,6 @@ class OrderViewSet(mixins.CreateModelMixin,
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        # print('Retrieve request = ', request)
-        # print('Retrieve args = ', args)
-        # print('Retrieve kwargs = ', kwargs)
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -57,4 +64,3 @@ class OrderViewSet(mixins.CreateModelMixin,
     def perform_destroy(self, instance):
         # print('Delete instance = ', instance)
         instance.delete()
-

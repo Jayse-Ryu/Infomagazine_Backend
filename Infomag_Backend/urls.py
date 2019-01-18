@@ -6,7 +6,6 @@ from rest_framework import routers
 # from rest_framework.authtoken import views
 
 from Users.views import UserViewSet
-from Guest.views import GuestFilterViewSet
 from Company.views import CompanyViewSet
 from Landing.views import LandingViewSet, LayoutViewSet
 from Files.views import ImageViewSet
@@ -16,11 +15,12 @@ from Term.views import TermViewSet
 from Url.views import UrlViewSet
 from Collection.views import CollectionViewSet
 from Order.views import OrderViewSet
+from Organization.views import OrganizationViewSet
+from UserAccess.views import UserAccessViewSet
 
 router = routers.DefaultRouter()
 # router.register('user', UserViewSet)
 router.register('user', UserViewSet, base_name='user')
-router.register('guest_filter', GuestFilterViewSet)
 router.register('company', CompanyViewSet, base_name='company')
 router.register('landing', LandingViewSet, base_name='landing')
 router.register('layout', LayoutViewSet, base_name='layout')
@@ -32,6 +32,8 @@ router.register('term', TermViewSet)
 router.register('url', UrlViewSet)
 router.register('collection', CollectionViewSet, base_name='collection')
 router.register('order', OrderViewSet, base_name='order')
+router.register('order', OrganizationViewSet, base_name='organization')
+router.register('user_access', UserAccessViewSet, base_name='user_access')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
