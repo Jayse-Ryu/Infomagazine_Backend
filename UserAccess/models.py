@@ -9,7 +9,7 @@ from Organization.models import Organization
 
 class UserAccess(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    access = models.IntegerField(default=1)
+    access = models.IntegerField(default=-1)
     organization = models.ForeignKey(Organization, null=True, blank=True, on_delete=models.SET_NULL)
     company = models.ForeignKey(Company, null=True, blank=True, on_delete=models.SET_NULL)
     created_date = models.DateTimeField(auto_now_add=True)
