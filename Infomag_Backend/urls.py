@@ -21,9 +21,12 @@ from UserAccess.views import UserAccessViewSet
 router = routers.DefaultRouter()
 # router.register('user', UserViewSet)
 router.register('user', UserViewSet, base_name='user')
+router.register('user_access', UserAccessViewSet, base_name='user_access')
 router.register('company', CompanyViewSet, base_name='company')
+router.register('organization', OrganizationViewSet, base_name='organization')
 router.register('landing', LandingViewSet, base_name='landing')
 router.register('layout', LayoutViewSet, base_name='layout')
+router.register('order', OrderViewSet, base_name='order')
 router.register('image', ImageViewSet)
 router.register('video', VideoViewSet)
 router.register('form_group', FormGroupViewSet)
@@ -31,9 +34,6 @@ router.register('field', FieldViewSet)
 router.register('term', TermViewSet)
 router.register('url', UrlViewSet)
 router.register('collection', CollectionViewSet, base_name='collection')
-router.register('order', OrderViewSet, base_name='order')
-router.register('organization', OrganizationViewSet, base_name='organization')
-router.register('user_access', UserAccessViewSet, base_name='user_access')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

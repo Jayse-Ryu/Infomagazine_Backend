@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from Company.models import Company
 from Users.models import User
 from Files.models import Image
@@ -29,7 +31,7 @@ class Landing(models.Model):
 
 
 class Layout(models.Model):
-    landing = models.ForeignKey(Landing, on_delete=models.CASCADE)
+    landing = models.OneToOneField(Landing, on_delete=models.CASCADE)
     # order = models.CharField(max_length=3000, blank=True, null=True)
     is_banner = models.BooleanField(default=False)
     banner_url = models.CharField(max_length=1000, null=True, blank=True)
@@ -50,3 +52,19 @@ class Layout(models.Model):
         if self.landing == None:
             return "ERROR-LANDING NAME IS NULL"
         return str(self.landing)
+
+
+@receiver(post_save, sender=Landing)
+def create_layout(sender, instance, created, **kwargs):
+    if created:
+        Layout.objects.create(landing=instance)
+
+
+# @receiver(post_save, sender=Landing)
+# def save_layout(sender, instance, **kwargs):
+#     # sender = user model
+#     # instance = account
+#     # kwarg = signal created? t update? none using? default
+#     print('sender is ', sender)
+#     print('instance is ', instance)
+#     instance.account.save()

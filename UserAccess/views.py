@@ -1,8 +1,9 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Organization
-from .serializers import UserAcessSerializer
+from .models import UserAccess
+# from .models import User
+from .serializers import UserAccessSerializer
 
 
 class UserAccessViewSet(mixins.CreateModelMixin,
@@ -11,9 +12,10 @@ class UserAccessViewSet(mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
-    queryset = Organization.objects.all().order_by('-created_date')
-    serializer_class = UserAcessSerializer
-    lookup_field = 'id'
+    queryset = UserAccess.objects.all().order_by('-created_date')
+    # sub_queryset = UserAccess.objects.all().order_by('-created_date')
+    serializer_class = UserAccessSerializer
+    lookup_field = 'user_id'
     # print('Basic view queryset = ', queryset)
 
     def create(self, request, *args, **kwargs):
@@ -41,6 +43,10 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         company = self.request.query_params.get('company', None)
         if company is not None:
             queryset = queryset.filter(company_name__icontains=company)
+
+        # user_id = self.request.query_params.get('user_id', None)
+        # if user_id is not None:
+        #     queryset = queryset.filter(user__exactly=user_id)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

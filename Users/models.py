@@ -13,7 +13,7 @@ import jwt
 # Abstracted User manager.
 class UserManager(BaseUserManager):
     def create_user(self, account, password=None, full_name=None,
-                    email=None, phone=None, admin=False, staff=False, active=True, is_guest=True):
+                    email=None, phone=None, admin=False, staff=False, active=True,):
         if not account:
             raise ValueError('아이디는 필수 항목입니다.')
         if not password:
@@ -40,9 +40,9 @@ class UserManager(BaseUserManager):
         user_obj.is_superuser = admin
         user_obj.is_staff = staff
         user_obj.is_active = active
-        user_obj.is_guest = is_guest
 
         user_obj.save(using=self._db)
+
         return user_obj
 
     def create_staffuser(self, account, password=None, full_name=None, email=None, phone=None):
@@ -53,7 +53,7 @@ class UserManager(BaseUserManager):
             email=email,
             phone=phone,
             staff=True,
-            is_guest=False,
+            active=True
         )
         user.save(using=self._db)
         return user
@@ -67,10 +67,14 @@ class UserManager(BaseUserManager):
             phone=phone,
             staff=True,
             admin=True,
-            is_guest=False,
+            active=True
         )
         user.save(using=self._db)
         return user
+
+    def make_order(request):
+        if request.method == 'POST':
+            print('My custom make order def! working on!')
 
 
 # Abstracted User fields with options (AbstractBaseUser, PermissionsMixin)
