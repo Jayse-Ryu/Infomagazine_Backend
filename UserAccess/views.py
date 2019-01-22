@@ -15,7 +15,7 @@ class UserAccessViewSet(mixins.CreateModelMixin,
     queryset = UserAccess.objects.all().order_by('-created_date')
     # sub_queryset = UserAccess.objects.all().order_by('-created_date')
     serializer_class = UserAccessSerializer
-    lookup_field = 'user_id'
+    lookup_field = 'user'
     # print('Basic view queryset = ', queryset)
 
     def create(self, request, *args, **kwargs):
@@ -33,6 +33,10 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(user_name__icontains=name)
+
+        user = self.request.query_params.get('user', None)
+        if user is not None:
+            queryset = queryset.filter(user_id__exact=user)
 
         # If list searched as manager name
         organization = self.request.query_params.get('organization', None)
@@ -72,6 +76,21 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         self.perform_update(serializer)
         return Response(serializer.data)
 
+    def partial_update(self, request, *args, **kwargs):
+        # print('Patch request = ', request)
+        # print('Patch args = ', args)
+        # print('Patch kwargs = ', kwargs)
+        kwargs['partial'] = True
+        partial = kwargs.pop('partial = ', True)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
     def perform_destroy(self, instance):
         # print('Delete instance = ', instance)
         instance.delete()
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
