@@ -1,9 +1,11 @@
 from django.db import models
 from Users.models import User
+from Organization.models import Organization
 
 
 class Company(models.Model):
     manager = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=100)
     sub_name = models.CharField(max_length=100, blank=True, null=True)
     header = models.CharField(max_length=20, blank=True, null=True)

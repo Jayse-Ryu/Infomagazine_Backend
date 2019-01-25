@@ -37,6 +37,10 @@ class CompanyViewSet(mixins.CreateModelMixin,
         if manager is not None:
             queryset = queryset.filter(manager__full_name__icontains=manager)
 
+        organization = self.request.query_params.get('organization', None)
+        if organization is not None:
+            queryset = queryset.filter(organization__exact=organization)
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
