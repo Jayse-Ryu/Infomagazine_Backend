@@ -2,8 +2,9 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from django.db.models import Q
 from .models import UserAccess
-# from .models import User
 from .serializers import UserAccessSerializer
+from Users.models import User
+from itertools import chain
 
 
 class UserAccessViewSet(mixins.CreateModelMixin,
@@ -13,10 +14,8 @@ class UserAccessViewSet(mixins.CreateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
     queryset = UserAccess.objects.all().order_by('-created_date')
-    # sub_queryset = UserAccess.objects.all().order_by('-created_date')
     serializer_class = UserAccessSerializer
     lookup_field = 'user'
-    # print('Basic view queryset = ', queryset)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -27,30 +26,41 @@ class UserAccessViewSet(mixins.CreateModelMixin,
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        user = User.objects.all().order_by('-created_date')
 
-        # (name = str, manager = str,)
-        # If list searched as company name or sub_name
+        # If list searched as user name
         name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(user_name__icontains=name)
 
+        # as user id
         user = self.request.query_params.get('user', None)
         if user is not None:
             queryset = queryset.filter(user_id__exact=user)
 
-        # If list searched as manager name
+        # as organization id
         organization = self.request.query_params.get('organization', None)
         if organization is not None:
-            queryset = queryset.filter(organization_name__icontains=organization)
+            queryset = queryset.filter(organization__exact=organization)
 
-        # If list searched as manager name
+        # as organization name
+        org_name = self.request.query_params.get('org_name', None)
+        if org_name is not None:
+            queryset = queryset.filter(organization_name__icontains=org_name)
+
+        # company id
         company = self.request.query_params.get('company', None)
         if company is not None:
-            queryset = queryset.filter(company_name__icontains=company)
+            queryset = queryset.filter(company_name__exact=company)
 
-        # user_id = self.request.query_params.get('user_id', None)
-        # if user_id is not None:
-        #     queryset = queryset.filter(user__exactly=user_id)
+        # company name
+        com_name = self.request.query_params.get('com_name', None)
+        if com_name is not None:
+            queryset = queryset.filter(company_name__icontains=com_name)
+
+        # merge_user = self.request.query_params.get('merge_user', None)
+        # if merge_user is not None:
+        #     queryset = list(chain(queryset, user))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
