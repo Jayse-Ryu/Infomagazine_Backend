@@ -13,7 +13,7 @@ class UserAccessViewSet(mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
-    queryset = UserAccess.objects.all().order_by('-created_date')
+    queryset = UserAccess.objects.all().order_by('-updated_date')
     serializer_class = UserAccessSerializer
     lookup_field = 'user'
 
@@ -26,7 +26,7 @@ class UserAccessViewSet(mixins.CreateModelMixin,
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        user = User.objects.all().order_by('-created_date')
+        user = User.objects.all().order_by('-updated_date')
 
         # If list searched as user name
         name = self.request.query_params.get('name', None)
@@ -51,7 +51,7 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         # company id
         company = self.request.query_params.get('company', None)
         if company is not None:
-            queryset = queryset.filter(company_name__exact=company)
+            queryset = queryset.filter(company__exact=company)
 
         # company name
         com_name = self.request.query_params.get('com_name', None)

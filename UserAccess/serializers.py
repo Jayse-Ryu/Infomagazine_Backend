@@ -53,6 +53,8 @@ class UserAccessSerializer(serializers.ModelSerializer):
         fields = ('user', 'access', 'organization', 'company',
                   'account', 'user_name', 'organization_name', 'company_name', 'phone', 'email',
                   'created_date', 'updated_date')
+        # fields = ('user', 'access', 'organization', 'company',
+        #           'created_date', 'updated_date')
 
     # def create(self, validated_data):
     #     user_data = validated_data.pop('user')
