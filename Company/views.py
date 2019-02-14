@@ -37,6 +37,10 @@ class CompanyViewSet(mixins.CreateModelMixin,
         if manager is not None:
             queryset = queryset.filter(manager__full_name__icontains=manager)
 
+        # company = self.request.query_params.get('company', None)
+        # if company is not None:
+        #     queryset = queryset.filter(company__exact=company)
+
         organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization__exact=organization)

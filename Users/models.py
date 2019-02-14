@@ -115,6 +115,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated_date = models.DateTimeField(
         auto_now=True,
     )
+    last_login = models.DateTimeField(
+        _('last login'),
+        # auto_now_add=True,
+        auto_now=True,
+        blank=True,
+        null=True
+    )
 
     # User Management object
     objects = UserManager()
