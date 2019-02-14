@@ -62,6 +62,10 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         # if merge_user is not None:
         #     queryset = list(chain(queryset, user))
 
+        sort = self.request.query_params.get('sort', None)
+        if sort is not None:
+            queryset = queryset.order_by('-created_date')
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
