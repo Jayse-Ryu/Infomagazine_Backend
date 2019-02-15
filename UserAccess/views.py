@@ -31,12 +31,16 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         # If list searched as user name
         name = self.request.query_params.get('name', None)
         if name is not None:
-            queryset = queryset.filter(user_name__icontains=name)
+            queryset = queryset.filter(user__full_name__icontains=name)
 
         # as user id
         user = self.request.query_params.get('user', None)
         if user is not None:
             queryset = queryset.filter(user_id__exact=user)
+
+        account = self.request.query_params.get('account', None)
+        if account is not None:
+            queryset = queryset.filter(user__account__icontains=account)
 
         # as organization id
         organization = self.request.query_params.get('organization', None)
