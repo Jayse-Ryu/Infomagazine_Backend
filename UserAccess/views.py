@@ -3,8 +3,6 @@ from rest_framework.response import Response
 from django.db.models import Q
 from .models import UserAccess
 from .serializers import UserAccessSerializer
-from Users.models import User
-from itertools import chain
 
 
 class UserAccessViewSet(mixins.CreateModelMixin,
@@ -26,7 +24,6 @@ class UserAccessViewSet(mixins.CreateModelMixin,
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        user = User.objects.all().order_by('-updated_date')
 
         # If list searched as user name
         name = self.request.query_params.get('name', None)
@@ -46,6 +43,11 @@ class UserAccessViewSet(mixins.CreateModelMixin,
         organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization__exact=organization)
+
+        all_organization = self.request.query_params.get('all_organization', None)
+        if all_organization is not None:
+            queryset = queryset.filter(Q(organization__exact=all_organization) |
+                                       Q(company__organization_id__exact=all_organization))
 
         # as organization name
         org_name = self.request.query_params.get('org_name', None)
