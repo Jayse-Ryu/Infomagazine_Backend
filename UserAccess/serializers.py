@@ -11,6 +11,7 @@ class UserAccessSerializer(serializers.ModelSerializer):
     company_name = serializers.SerializerMethodField(required=False, default='비어있음')
     phone = serializers.SerializerMethodField(required=False, default='비어있음')
     email = serializers.SerializerMethodField(required=False, default='비어있음')
+    company_org = serializers.SerializerMethodField(required=False, default=None)
 
     def get_account(self, obj):
         if obj.user is not None:
@@ -21,18 +22,6 @@ class UserAccessSerializer(serializers.ModelSerializer):
     def get_user_name(self, obj):
         if obj.user is not None:
             return str(obj.user.full_name)
-        else:
-            return '비어있음'
-
-    def get_organization_name(self, obj):
-        if obj.organization is not None:
-            return str(obj.organization.name)
-        else:
-            return '비어있음'
-
-    def get_company_name(self, obj):
-        if obj.company is not None:
-            return str(obj.company.name)
         else:
             return '비어있음'
 
@@ -48,10 +37,28 @@ class UserAccessSerializer(serializers.ModelSerializer):
         else:
             return '비어있음'
 
+    def get_organization_name(self, obj):
+        if obj.organization is not None:
+            return str(obj.organization.name)
+        else:
+            return '비어있음'
+
+    def get_company_name(self, obj):
+        if obj.company is not None:
+            return str(obj.company.name)
+        else:
+            return '비어있음'
+
+    def get_company_org(self, obj):
+        if obj.company is not None:
+            return obj.company.organization_id
+        else:
+            return None
+
     class Meta:  # 'organization_name', 'company_name',
         model = UserAccess
         fields = ('user', 'access', 'organization', 'company',
-                  'account', 'user_name', 'organization_name', 'company_name', 'phone', 'email',
+                  'account', 'user_name', 'organization_name', 'company_name', 'phone', 'email', 'company_org',
                   'created_date', 'updated_date')
         # fields = ('user', 'access', 'organization', 'company',
         #           'created_date', 'updated_date')

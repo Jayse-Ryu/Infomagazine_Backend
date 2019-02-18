@@ -5,6 +5,7 @@ from .models import Company  # , GuestFilter
 class CompanySerializer(serializers.ModelSerializer):
     manager_name = serializers.SerializerMethodField(required=False, default='비어있음')
     organization_name = serializers.SerializerMethodField(required=False, default='비어있음')
+    company_org = serializers.SerializerMethodField(required=False, default='비어있음')
 
     def get_manager_name(self, obj):
         if obj.manager is not None:
