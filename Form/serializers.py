@@ -16,7 +16,14 @@ class FormGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FormGroup
-        fields = ('id', 'landing', 'name', 'back_color', 'text_color', 'fields', 'created_date', 'updated_date')
+        fields = ('id',
+                  'landing',
+                  'name',
+                  'back_color',
+                  'text_color',
+                  'fields',
+                  'created_date', 'updated_date'
+                  )
 
 
 class FieldSerializer(serializers.ModelSerializer):
@@ -24,5 +31,17 @@ class FieldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Field
-        fields = ('id', 'form_group', 'type', 'name', 'holder', 'value', 'url', 'list', 'width',
-                  'back_color', 'text_color', 'image', 'created_date', 'updated_date')
+        fields = ('id',
+                  'form_group',
+                  'type',
+                  'name',
+                  'holder',
+                  'value',
+                  'url',
+                  'list',
+                  'width',
+                  'back_color',
+                  'text_color',
+                  'image',
+                  'created_date', 'updated_date'
+                  )

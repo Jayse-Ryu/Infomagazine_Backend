@@ -14,4 +14,10 @@ class CollectionSerializer(serializers.ModelSerializer):
         # 모델 설정
         model = Collection
         # 필드 설정
-        fields = ('id', 'landing', 'data', 'url', 'form_group', 'created_date', 'updated_date')
+        fields = ('id',
+                  'landing',
+                  'data',
+                  'url',
+                  'form_group',
+                  'created_date', 'updated_date'
+                  )

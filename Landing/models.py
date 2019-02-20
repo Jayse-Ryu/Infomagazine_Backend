@@ -49,7 +49,7 @@ class Layout(models.Model):
 
     def __str__(self):
         # return str(self.created_date) or ''
-        if self.landing == None:
+        if self.landing is None:
             return "ERROR-LANDING NAME IS NULL"
         return str(self.landing)
 

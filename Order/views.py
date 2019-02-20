@@ -11,7 +11,7 @@ class OrderViewSet(mixins.CreateModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
-    queryset = Order.objects.all().order_by('position')
+    queryset = Order.objects.all().order_by('-created_date')
     serializer_class = OrderSerializer
     lookup_field = 'id'
     # permission_classes = (IsAuthenticatedOrReadOnly,)

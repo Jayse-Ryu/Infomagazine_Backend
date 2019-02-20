@@ -32,11 +32,6 @@ class CompanyViewSet(mixins.CreateModelMixin,
         if name is not None:
             queryset = queryset.filter(Q(name__icontains=name) | Q(sub_name__icontains=name))
 
-        # If list searched as manager name
-        manager = self.request.query_params.get('manager', None)
-        if manager is not None:
-            queryset = queryset.filter(manager__full_name__icontains=manager)
-
         company = self.request.query_params.get('company', None)
         if company is not None:
             queryset = queryset.filter(company__exact=company)
@@ -44,6 +39,10 @@ class CompanyViewSet(mixins.CreateModelMixin,
         organization = self.request.query_params.get('organization', None)
         if organization is not None:
             queryset = queryset.filter(organization__exact=organization)
+
+        org_name = self.request.query_params.get('org_name', None)
+        if org_name is not None:
+            queryset = queryset.filter(Q(organization__name__icontains=org_name) | Q(organization__sub_name__icontains=org_name))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
