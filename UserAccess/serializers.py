@@ -73,9 +73,13 @@ class UserAccessSerializer(serializers.ModelSerializer):
 
     class Meta:  # 'organization_name', 'company_name',
         model = UserAccess
-        fields = ('user', 'access', 'organization', 'company',
-                  'account', 'user_name', 'organization_name', 'company_name', 'phone', 'email', 'company_org',
-                  'user_staff', 'user_super', 'created_date', 'updated_date')
+        fields = ('user',
+                  'access',
+                  'organization', 'organization_name',
+                  'company', 'company_name', 'company_org',
+                  'account', 'user_name', 'phone', 'email', 'user_staff', 'user_super',
+                  'created_date', 'updated_date'
+                  )
         # fields = ('user', 'access', 'organization', 'company',
         #           'created_date', 'updated_date')
 

@@ -5,4 +5,10 @@ from .models import Term
 class TermSerializer(serializers.ModelSerializer):
     class Meta:
         model = Term
-        fields = ('id', 'landing', 'title', 'content', 'image', 'created_date', 'updated_date')
+        fields = ('id',
+                  'landing',
+                  'title',
+                  'content',
+                  'image',
+                  'created_date', 'updated_date'
+                  )
