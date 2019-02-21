@@ -3,9 +3,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from Landing.models import Layout
-from Files.models import Image
 from Company.models import Company
 from Landing.models import Landing
+
+from Files.models import Image
+from Form.models import FormGroup
+from Video.models import Video
 
 
 class Order(models.Model):
@@ -13,7 +16,7 @@ class Order(models.Model):
     name = models.CharField(max_length=30, default='ORDER')
     position = models.TextField(null=True, blank=True)
     type = models.IntegerField(default=0)
-    # image = models.ForeignKey(Image, null=True, on_delete=models.SET_NULL)
+    # relative = models.ManyToOneRel(Image, Video, FormGroup)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 

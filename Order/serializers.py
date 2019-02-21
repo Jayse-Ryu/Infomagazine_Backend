@@ -12,8 +12,8 @@ class PositionSerializer(serializers.JSONField):
 
 class OrderSerializer(serializers.ModelSerializer):
     position = PositionSerializer()
-
-    # item = serializers.SerializerMethodField(required=False, default='')
+    item = serializers.SerializerMethodField(required=False, default='')
+    # type always 0 temporary
 
     def get_item(self, obj):
         if obj.type is 1:
