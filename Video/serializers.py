@@ -7,4 +7,4 @@ class VideoSerializer(serializers.ModelSerializer):
         # 모델 설정
         model = Video
         # 필드 설정
-        fields = ('id', 'layout', 'type', 'url', 'desc', 'created_date', 'updated_date')
+        fields = ('id', 'type', 'url', 'desc', 'created_date', 'updated_date')

@@ -3,7 +3,7 @@ from Landing.models import Layout
 
 
 class Video(models.Model):
-    layout = models.ForeignKey(Layout, on_delete=models.CASCADE)
+    # layout = models.ForeignKey(Layout, on_delete=models.CASCADE)
     type = models.IntegerField(default=0)
     url = models.CharField(max_length=500, blank=True, null=True)
     desc = models.CharField(max_length=100, blank=True, null=True)

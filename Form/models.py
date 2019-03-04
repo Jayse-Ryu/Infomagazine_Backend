@@ -26,7 +26,7 @@ class Field(models.Model):
     holder = models.CharField(max_length=50, blank=True)
     value = models.CharField(max_length=50, blank=True, null=True)
     url = models.CharField(max_length=1000, blank=True, null=True)
-    list = models.CharField(max_length=200, blank=True, null=True)
+    list = models.TextField(blank=True, null=True)
     width = models.IntegerField(default=12)
     back_color = models.CharField(max_length=7, default='', blank=True)
     text_color = models.CharField(max_length=7, default='', blank=True)

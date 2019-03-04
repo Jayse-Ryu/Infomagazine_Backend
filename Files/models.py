@@ -9,4 +9,4 @@ class Image(models.Model):
         db_table = 'image'
 
     def __str__(self):
-        return self.image
+        return str(self.image)

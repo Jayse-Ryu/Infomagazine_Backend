@@ -14,7 +14,6 @@ class OrderViewSet(mixins.CreateModelMixin,
     queryset = Order.objects.all().order_by('-created_date')
     serializer_class = OrderSerializer
     lookup_field = 'id'
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -25,6 +24,10 @@ class OrderViewSet(mixins.CreateModelMixin,
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+
+        layout = self.request.query_params.get('layout', None)
+        if layout is not None:
+            queryset = queryset.filter(layout__exact=layout)
 
         # Pagination
         page = self.paginate_queryset(queryset)
