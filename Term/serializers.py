@@ -6,7 +6,7 @@ class TermSerializer(serializers.ModelSerializer):
     class Meta:
         model = Term
         fields = ('id',
-                  'landing',
+                  'layout',
                   'title',
                   'content',
                   'image',

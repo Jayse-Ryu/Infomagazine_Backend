@@ -17,7 +17,7 @@ class FormGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormGroup
         fields = ('id',
-                  'landing',
+                  'layout',
                   'name',
                   'back_color',
                   'text_color',

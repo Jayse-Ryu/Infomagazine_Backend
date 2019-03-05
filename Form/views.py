@@ -27,9 +27,9 @@ class FormGroupViewSet(mixins.CreateModelMixin,
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        landing = self.request.query_params.get('landing', None)
-        if landing is not None:
-            queryset = queryset.filter(landing__exact=landing)
+        layout = self.request.query_params.get('layout', None)
+        if layout is not None:
+            queryset = queryset.filter(landing__exact=layout)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

@@ -1,10 +1,10 @@
 from django.db import models
-from Landing.models import Landing
+from Landing.models import Layout
 from Files.models import Image
 
 
 class FormGroup(models.Model):
-    landing = models.ForeignKey(Landing, null=True, on_delete=models.CASCADE)
+    layout = models.ForeignKey(Layout, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, default='', blank=True)
     back_color = models.CharField(max_length=7, default='', blank=True)
     text_color = models.CharField(max_length=7, default='', blank=True)

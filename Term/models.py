@@ -1,10 +1,10 @@
 from django.db import models
-from Landing.models import Landing
+from Landing.models import Layout
 from Files.models import Image
 
 
 class Term(models.Model):
-    landing = models.ForeignKey(Landing, on_delete=models.CASCADE)
+    layout = models.ForeignKey(Layout, on_delete=models.CASCADE)
     title = models.CharField(max_length=50, default='', blank=True)
     content = models.CharField(max_length=5000, blank=True, null=True)
     image = models.ForeignKey(Image, blank=True, null=True, on_delete=models.SET_NULL)
