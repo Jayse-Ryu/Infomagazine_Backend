@@ -3,8 +3,8 @@ from .models import FormGroup, Field
 import json
 
 
-class JsonSerializer(serializers.JSONField):
-    fields = json.encoder
+# class JsonSerializer(serializers.JSONField):
+#     fields = json.encoder
 
 
 class ListSerializer(serializers.ListField):
@@ -12,7 +12,6 @@ class ListSerializer(serializers.ListField):
 
 
 class FormGroupSerializer(serializers.ModelSerializer):
-    fields = JsonSerializer()
 
     class Meta:
         model = FormGroup
@@ -21,7 +20,6 @@ class FormGroupSerializer(serializers.ModelSerializer):
                   'name',
                   'back_color',
                   'text_color',
-                  'fields',
                   'created_date', 'updated_date'
                   )
 

@@ -8,7 +8,6 @@ class FormGroup(models.Model):
     name = models.CharField(max_length=50, default='', blank=True)
     back_color = models.CharField(max_length=7, default='', blank=True)
     text_color = models.CharField(max_length=7, default='', blank=True)
-    fields = models.CharField(max_length=100, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
