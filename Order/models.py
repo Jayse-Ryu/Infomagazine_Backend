@@ -1,6 +1,6 @@
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
 
 from Landing.models import Layout
 # from Company.models import Company
@@ -29,7 +29,7 @@ class Order(models.Model):
         return self.name
 
 
-@receiver(post_save, sender=Layout)
-def create_user_access(sender, instance, created, **kwargs):
-    if created:
-        Order.objects.create(layout=instance)
+# @receiver(post_save, sender=Layout)
+# def create_user_access(sender, instance, created, **kwargs):
+#     if created:
+#         Order.objects.create(layout=instance)
