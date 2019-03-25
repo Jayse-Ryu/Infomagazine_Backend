@@ -7,8 +7,8 @@ import json
 #     fields = json.encoder
 
 
-class ListSerializer(serializers.ListField):
-    list = list
+# class ListSerializer(serializers.ListField):
+#     list = serializers.CharField()
 
 
 class FormGroupSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class FormGroupSerializer(serializers.ModelSerializer):
 
 
 class FieldSerializer(serializers.ModelSerializer):
-    list = ListSerializer()
+    # list = ListSerializer()
 
     class Meta:
         model = Field
