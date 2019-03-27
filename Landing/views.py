@@ -82,11 +82,11 @@ class LandingViewSet(mixins.CreateModelMixin,
 
 
 class LayoutViewSet(mixins.CreateModelMixin,
-                     mixins.ListModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     mixins.DestroyModelMixin,
-                     viewsets.GenericViewSet):
+                    mixins.ListModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Layout.objects.all().order_by('-created_date')
     serializer_class = LayoutSerializer
     lookup_field = 'id'
@@ -107,6 +107,11 @@ class LayoutViewSet(mixins.CreateModelMixin,
         name = self.request.query_params.get('name', None)
         if name is not None:
             queryset = queryset.filter(name__icontains=name)
+
+        # Search layout list as landing id
+        landing = self.request.query_params.get('landing', None)
+        if landing is not None:
+            queryset = queryset.filter(landing__exact=landing)
 
         # Pagination
         page = self.paginate_queryset(queryset)
