@@ -93,9 +93,9 @@ class FieldViewSet(mixins.CreateModelMixin,
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        group = self.request.query_params.get('group', None)
-        if group is not None:
-            queryset = queryset.filter(form_group__exact=group)
+        form_group = self.request.query_params.get('form_group', None)
+        if form_group is not None:
+            queryset = queryset.filter(form_group__exact=form_group)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
