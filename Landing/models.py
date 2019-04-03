@@ -54,10 +54,10 @@ class Layout(models.Model):
         return str(self.landing)
 
 
-@receiver(post_save, sender=Landing)
-def create_layout(sender, instance, created, **kwargs):
-    if created:
-        Layout.objects.create(landing=instance)
+# @receiver(post_save, sender=Landing)
+# def create_layout(sender, instance, created, **kwargs):
+#     if created:
+#         Layout.objects.create(landing=instance)
 
 
 # @receiver(post_save, sender=Landing)

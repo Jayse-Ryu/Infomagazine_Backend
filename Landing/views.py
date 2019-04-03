@@ -76,11 +76,6 @@ class LandingViewSet(mixins.CreateModelMixin,
         instance.delete()
 
 
-# class LayoutViewSet(viewsets.ModelViewSet):
-#     queryset = Layout.objects.all()
-#     serializer_class = LayoutSerializer
-
-
 class LayoutViewSet(mixins.CreateModelMixin,
                     mixins.ListModelMixin,
                     mixins.RetrieveModelMixin,
