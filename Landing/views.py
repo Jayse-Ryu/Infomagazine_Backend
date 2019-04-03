@@ -1,3 +1,5 @@
+import boto3
+from decouple import config
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -11,7 +13,25 @@ from .models import Landing, Layout
 class LandingViewSet(ViewSet):
     def create(self, request):
         req = json.loads(request.body)
-        return Response(req, status=status.HTTP_200_OK)
+        session = boto3.session.Session(aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+                                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+                                        # aws_session_token=config('AWS_SESSION_TOKEN'),
+                                        region_name='ap-northeast-2')
+        #
+        dynamo_db = session.resource('dynamodb')
+        #
+        table = dynamo_db.Table('Infomagazine')
+        #
+        dynamo_db_res = table.put_item(Item={
+            "LandingName": req['LandingName'],
+            "LadingInfo": req['LandingInfo']
+        })
+        #
+        if dynamo_db_res['ResponseMetadata']['HTTPStatusCode'] == 200:
+            return Response(req, status=status.HTTP_200_OK)
+        else:
+            return Response(req, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # return Response("test", status=status.HTTP_200_OK)
 
 
 # class LandingViewSet(mixins.CreateModelMixin,
