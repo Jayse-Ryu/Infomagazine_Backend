@@ -24,7 +24,6 @@ router.register('user', UserViewSet, base_name='user')
 router.register('user_access', UserAccessViewSet, base_name='user_access')
 router.register('company', CompanyViewSet, base_name='company')
 router.register('organization', OrganizationViewSet, base_name='organization')
-router.register('landing', LandingViewSet, base_name='landing')
 router.register('layout', LayoutViewSet, base_name='layout')
 router.register('order', OrderViewSet, base_name='order')
 router.register('image', ImageViewSet)
@@ -38,6 +37,8 @@ router.register('collection', CollectionViewSet, base_name='collection')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
+    path('landing/', include('Landing.urls')),
+
 
     # JWT auth
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
