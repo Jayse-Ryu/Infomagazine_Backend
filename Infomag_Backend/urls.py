@@ -7,16 +7,16 @@ from rest_framework import routers
 
 from Users.views import UserViewSet
 from Company.views import CompanyViewSet
-from Landing.views import LandingViewSet, LayoutViewSet
-from Files.views import ImageViewSet
-from Video.views import VideoViewSet
-from Form.views import FormGroupViewSet, FieldViewSet
-from Term.views import TermViewSet
-from Url.views import UrlViewSet
-from Collection.views import CollectionViewSet
-from Order.views import OrderViewSet
 from Organization.views import OrganizationViewSet
 from UserAccess.views import UserAccessViewSet
+# from Landing.views import LandingViewSet, LayoutViewSet
+# from Files.views import ImageViewSet
+# from Video.views import VideoViewSet
+# from Form.views import FormGroupViewSet, FieldViewSet
+# from Term.views import TermViewSet
+# from Url.views import UrlViewSet
+# from Collection.views import CollectionViewSet
+# from Order.views import OrderViewSet
 
 router = routers.DefaultRouter()
 # router.register('user', UserViewSet)
@@ -24,15 +24,15 @@ router.register('user', UserViewSet, base_name='user')
 router.register('user_access', UserAccessViewSet, base_name='user_access')
 router.register('company', CompanyViewSet, base_name='company')
 router.register('organization', OrganizationViewSet, base_name='organization')
-router.register('layout', LayoutViewSet, base_name='layout')
-router.register('order', OrderViewSet, base_name='order')
-router.register('image', ImageViewSet)
-router.register('video', VideoViewSet)
-router.register('form_group', FormGroupViewSet, base_name='form_group')
-router.register('field', FieldViewSet, base_name='field')
-router.register('term', TermViewSet, base_name='term')
-router.register('url', UrlViewSet, base_name='url')
-router.register('collection', CollectionViewSet, base_name='collection')
+# router.register('layout', LayoutViewSet, base_name='layout')
+# router.register('order', OrderViewSet, base_name='order')
+# router.register('image', ImageViewSet)
+# router.register('video', VideoViewSet)
+# router.register('form_group', FormGroupViewSet, base_name='form_group')
+# router.register('field', FieldViewSet, base_name='field')
+# router.register('term', TermViewSet, base_name='term')
+# router.register('url', UrlViewSet, base_name='url')
+# router.register('collection', CollectionViewSet, base_name='collection')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
