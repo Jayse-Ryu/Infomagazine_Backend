@@ -6,10 +6,7 @@ from rest_framework.response import Response
 import json
 import decimal
 from rest_framework.viewsets import ViewSet
-
-
-# from .serializers import LandingSerializer, LayoutSerializer
-# from .models import Landing, Layout
+from boto3.dynamodb.conditions import Key, Attr
 
 
 class LandingViewSet(ViewSet):
@@ -29,7 +26,7 @@ class LandingViewSet(ViewSet):
         dynamo_db_res = table.put_item(
             Item={
                 "LandingName": req['LandingName'],
-                "LadingInfo": req['LandingInfo']
+                "LandingInfo": req['LandingInfo']
             }
         )
 
@@ -38,7 +35,7 @@ class LandingViewSet(ViewSet):
         else:
             return Response(req, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
@@ -46,11 +43,39 @@ class LandingViewSet(ViewSet):
             region_name='ap-northeast-2'
         )
 
+        # print('get self', self)
+        # print('get request', request)
+        # print('get args', args)
+        # print('get kwargs', kwargs)
+
         dynamo_db = session.resource('dynamodb')
 
         table = dynamo_db.Table('Infomagazine')
 
-        dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
+        test = table.query(
+            KeyConditionExpression=Key('LandingName').eq('KYUNGKIDO')
+        )
+
+        for i in test['Items']:
+            # print(i['year'], ":", i['title'])
+            print(i['LandingName'], 'and', i['LandingInfo'])
+
+        # fe = Key('date').between(1950, 1959)
+        # pe = "#yr, title, info.rating"
+        # # Expression Attribute Names for Projection Expression only.
+        # ean = {"#yr": "year", }
+
+        dynamo_db_res = json.dumps(
+            table.scan(
+
+            ),
+            cls=DecimalEncoder
+        )
+        # dynamo_db_res = table.scan(
+        #     LandingName=fe,
+        #     LandingInfo=pe,
+        #     ExpressionAttributeNames=ean
+        # )
 
         return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
 
@@ -63,21 +88,6 @@ class DecimalEncoder(json.JSONEncoder):
             else:
                 return int(o)
         return super(DecimalEncoder, self).default(o)
-
-    # def get_list_of_billionaires(param):
-    #     try:
-    #       table = dynamodb.Table('put_your_amazon_dynamodb_table_name_here')
-    #     except botocore.exceptions.ClientError as e:
-    #       # http://stackoverflow.com/questions/33068055/boto3-python-and-how-to-handle-errors
-    #       return 'failed'
-    #     else:
-    #       response = table.scan()
-    #       if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-    #         try:
-    #           item = response['Item']
-    #         except KeyError:
-    #           return None
-    #         return item
 
 
 # class LandingViewSet(mixins.CreateModelMixin,
@@ -149,8 +159,6 @@ class DecimalEncoder(json.JSONEncoder):
 #     def perform_destroy(self, instance):
 #         # print('Delete instance = ', instance)
 #         instance.delete()
-
-
 # class LayoutViewSet(mixins.CreateModelMixin,
 #                     mixins.ListModelMixin,
 #                     mixins.RetrieveModelMixin,
