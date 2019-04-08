@@ -1,15 +1,22 @@
 import boto3
 from decouple import config
-from rest_framework import viewsets, mixins, status
+from rest_framework.viewsets import ViewSet
+from rest_framework import mixins, status
 # from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from django.db.models import Q
 import json
 import decimal
-from rest_framework.viewsets import ViewSet
+
 from boto3.dynamodb.conditions import Key, Attr
+from UserAccess.models import UserAccess
+from Company.models import Company
+from UserAccess.serializers import UserAccessSerializer
+from Company.serializers import CompanySerializer
 
 
-class LandingViewSet(ViewSet):
+class LandingViewSet(ViewSet, mixins.ListModelMixin):
+
     def create(self, request):
         req = json.loads(request.body)
         session = boto3.session.Session(
@@ -26,7 +33,8 @@ class LandingViewSet(ViewSet):
         dynamo_db_res = table.put_item(
             Item={
                 "LandingName": req['LandingName'],
-                "LandingInfo": req['LandingInfo']
+                "LandingInfo": req['LandingInfo'],
+                "LandingTime": req['LandingTime']
             }
         )
 
@@ -35,7 +43,7 @@ class LandingViewSet(ViewSet):
         else:
             return Response(req, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get(self, request, *args, **kwargs):
+    def get(self):
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
@@ -43,39 +51,82 @@ class LandingViewSet(ViewSet):
             region_name='ap-northeast-2'
         )
 
-        # print('get self', self)
-        # print('get request', request)
-        # print('get args', args)
-        # print('get kwargs', kwargs)
+        dynamo_db = session.resource('dynamodb')
+
+        table = dynamo_db.Table('Infomagazine')
+
+        dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
+
+        return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
+
+    def list(self, request, *args, **kwargs):
+        manager_queryset = UserAccess.objects.all()
+        manager_serializer_class = UserAccessSerializer
+        company_queryset = Company.objects.all()
+        company_serializer_class = CompanySerializer
+
+        session = boto3.session.Session(
+            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            # aws_session_token=config('AWS_SESSION_TOKEN'),
+            region_name='ap-northeast-2'
+        )
+
+        # Filter object along url params
+        # Filter object along url params
+
+        # If list searched as user name
+        manager = self.request.query_params.get('manager', None)
+        if manager is not None:
+            manager_queryset = manager_queryset.filter(
+                Q(user__full_name__icontains=manager) | Q(user__account__icontains=manager)
+            )
+            manager_serializer = manager_serializer_class(manager_queryset, many=True)
+            print('manager data', manager_serializer.data)
+        else:
+            print('manager is none')
+
+        company = self.request.query_params.get('company', None)
+        if company is not None:
+            company_queryset = company_queryset.filter(
+                Q(name__icontains=company) | Q(sub_name__icontains=company)
+            )
+            company_serializer = company_serializer_class(company_queryset, many=True)
+            print('company data', company_serializer.data)
+        else:
+            print('company is none')
+
+        # Url filter done
+        # Dynamo filter start
 
         dynamo_db = session.resource('dynamodb')
 
         table = dynamo_db.Table('Infomagazine')
 
-        test = table.query(
-            KeyConditionExpression=Key('LandingName').eq('KYUNGKIDO')
-        )
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            name_param = name
+            dynamo_db_res = json.dumps(
+                table.scan(
+                    FilterExpression=Key('LandingName').eq(name_param)
+                ),
+                cls=DecimalEncoder)
 
-        for i in test['Items']:
-            # print(i['year'], ":", i['title'])
-            print(i['LandingName'], 'and', i['LandingInfo'])
+        else:
+            dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
 
-        # fe = Key('date').between(1950, 1959)
-        # pe = "#yr, title, info.rating"
-        # # Expression Attribute Names for Projection Expression only.
-        # ean = {"#yr": "year", }
+        # for key, value in json.loads(dynamo_db_res):
+        #     # print('item', item['Items'])
+        #     print(key, value)
 
-        dynamo_db_res = json.dumps(
-            table.scan(
-
-            ),
-            cls=DecimalEncoder
-        )
-        # dynamo_db_res = table.scan(
-        #     LandingName=fe,
-        #     LandingInfo=pe,
-        #     ExpressionAttributeNames=ean
-        # )
+        for key, possible_values in json.loads(dynamo_db_res).items():
+            # print('item', item['Items'])
+            print('key print', key)
+            print('possible value', possible_values)
+            if 'Items' in key:
+                print(key)
+                print('inside!')
+                break
 
         return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
 
