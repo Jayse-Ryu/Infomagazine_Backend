@@ -131,9 +131,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
                     section['LandingInfo']['landing']['company_name'] = get_company
             break
 
-        # print('temp result', dynamo_obj)
-        # print('dynamo dbis', json.loads(dynamo_db_res))
-
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
     def get_manager(self, *args):
@@ -165,6 +162,16 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self).default(o)
 
 
+# landing views: view has to be a number
+# landing collection: has to blank list
+
+# term image: empty list?
+
+# field type: why string? i want number
+
+# order image url none parse
+
+
 req_body_chk = {
     'LandingName': 'full landing',
     'LandingTime': 1554788867806,
@@ -181,9 +188,9 @@ req_body_chk = {
             'hijack_url': None,
             'is_active': True,
             'is_mobile': False,
-            # view has to be a number
+            # view has to be a number done
             'views': None,
-            # has to blank list
+            # has to blank list done
             'collections': None,
             'is_banner': False,
             'banner_url': None,
@@ -220,53 +227,6 @@ req_body_chk = {
                 'text_color': '#fafafa',
                 'list': [],
                 'image_data': []
-            },
-            {
-                'sign': 2,
-                'type': '2',
-                'name': 'num',
-                'holder': 'num',
-                'form_group_id': 1,
-                'back_color': '#287BFF',
-                'text_color': '#f0f0f0',
-                'list': [],
-                'image_data': []
-            },
-            {
-                'sign': 3,
-                'type': '4',
-                'name': 'selbtn',
-                'holder': 'selbtn',
-                'form_group_id': 1,
-                'back_color': '#287BFF',
-                'text_color': '#f0f0f0',
-                'list': [
-                    'sel1',
-                    'sel2'
-                ],
-                'image_data': []
-            },
-            {
-                'sign': 4,
-                'type': '8',
-                'name': 'callbtn',
-                'holder': 'callbtn',
-                'form_group_id': 1,
-                'back_color': '#bdd7ff',
-                'text_color': '#f0f0f0',
-                'list': [],
-                'image_data': []
-            },
-            {
-                'sign': 5,
-                'type': '9',
-                'name': 'done',
-                'holder': 'done',
-                'form_group_id': 1,
-                'back_color': '#287BFF',
-                'text_color': '#f0f0f0',
-                'list': [],
-                'image_data': []
             }
         ],
         'order': [
@@ -282,36 +242,7 @@ req_body_chk = {
                     'z': 1
                 },
                 'image_data': [],
-                'image_url': '',
-                'video_type': 1
-            },
-            {
-                'sign': 3,
-                'type': 1,
-                'name': 'new layout',
-                'position': {
-                    'x': 390,
-                    'y': 5,
-                    'w': 100,
-                    'h': 100,
-                    'z': 3
-                },
-                'image_data': [],
-                'image_url': '',
-                'video_type': 1
-            },
-            {
-                'sign': 4,
-                'type': 1,
-                'name': 'new layout',
-                'position': {
-                    'x': 0,
-                    'y': 0,
-                    'w': 100,
-                    'h': 100,
-                    'z': 4
-                },
-                'image_data': [],
+                # image url null filter??
                 'image_url': '',
                 'video_type': 1
             }
