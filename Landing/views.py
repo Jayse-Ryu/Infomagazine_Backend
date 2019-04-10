@@ -1,4 +1,5 @@
 import boto3
+import botocore
 from decouple import config
 from rest_framework.viewsets import ViewSet
 from rest_framework import mixins, status
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 from django.db.models import Q
 import json
 import decimal
+# from boto3.s3.transfer import TransferConfig
 
 from boto3.dynamodb.conditions import Key, Attr
 from UserAccess.models import UserAccess
@@ -17,9 +19,12 @@ from Company.serializers import CompanySerializer
 
 class LandingViewSet(ViewSet, mixins.ListModelMixin):
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         req = json.loads(request.body)
-        print(req)
+        print('request landing info ', req['LandingInfo'])
+        print('arg', args)
+        print('kwarg', kwargs)
+
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
@@ -27,8 +32,36 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
             region_name='ap-northeast-2'
         )
 
+        s3 = session.resource('s3')
         dynamo_db = session.resource('dynamodb')
 
+        print('field obj?', req['LandingInfo']['field'][0]['image_data'][0])
+        print('order obj?', req['LandingInfo']['order'][0]['image_data'])
+
+        dum = json.dumps(request.body)
+        term_file = dum['LandingInfo']['field'][0]['image_data'][0]
+        # term_file = req['LandingInfo']['term']['term_image']
+        # term_file = req['LandingInfo']['term']['term_image']
+
+        print('try to put items')
+        # s3.Object(config('AWS_STORAGE_BUCKET_NAME'), 'test.jpg').upload_file(term_file.name)
+
+        key = 'button.jpg'
+
+        try:
+            file = s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).download_file(key, 'my_local_image.jpg')
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                print("The object does not exist.")
+            else:
+                print('get boto is error', e)
+                raise
+
+        print('file', file)
+        print('bucket put')
+        s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).put_object(Key='test.txt', Body=term_file)
+
+        print('table put')
         table = dynamo_db.Table('Infomagazine')
 
         dynamo_db_res = table.put_item(
