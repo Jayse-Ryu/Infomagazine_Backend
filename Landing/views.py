@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from django.db.models import Q
 import json
 import decimal
-# from boto3.s3.transfer import TransferConfig
 
 from boto3.dynamodb.conditions import Key, Attr
 from UserAccess.models import UserAccess
@@ -17,14 +16,10 @@ from UserAccess.serializers import UserAccessSerializer
 from Company.serializers import CompanySerializer
 
 
-class LandingViewSet(ViewSet, mixins.ListModelMixin):
+class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         req = json.loads(request.body)
-        print('request landing info ', req['LandingInfo'])
-        print('arg', args)
-        print('kwarg', kwargs)
-
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
@@ -32,43 +27,41 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
             region_name='ap-northeast-2'
         )
 
-        s3 = session.resource('s3')
         dynamo_db = session.resource('dynamodb')
 
-        print('field obj?', req['LandingInfo']['field'][0]['image_data'][0])
-        print('order obj?', req['LandingInfo']['order'][0]['image_data'])
 
-        dum = json.dumps(request.body)
-        term_file = dum['LandingInfo']['field'][0]['image_data'][0]
+        # s3 = session.resource('s3')
+        #
+        # dum = json.dumps(request.body)
         # term_file = req['LandingInfo']['term']['term_image']
-        # term_file = req['LandingInfo']['term']['term_image']
+        #
+        # print('try to put items')
+        #
+        # key = 'button.jpg'
+        #
+        # try:
+        #     s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(key, term_file)
+        #     # file = s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).download_file(key, 'my_local_image.jpg')
+        # except botocore.exceptions.ClientError as e:
+        #     if e.response['Error']['Code'] == "404":
+        #         print("The object does not exist.")
+        #     else:
+        #         print('get boto is error', e)
+        #         raise
 
-        print('try to put items')
-        # s3.Object(config('AWS_STORAGE_BUCKET_NAME'), 'test.jpg').upload_file(term_file.name)
+        # print('file', file)
+        # print('bucket put')
+        # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).put_object(Key='test.txt', Body=term_file)
 
-        key = 'button.jpg'
+        # print('table put')
 
-        try:
-            file = s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).download_file(key, 'my_local_image.jpg')
-        except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                print("The object does not exist.")
-            else:
-                print('get boto is error', e)
-                raise
-
-        print('file', file)
-        print('bucket put')
-        s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).put_object(Key='test.txt', Body=term_file)
-
-        print('table put')
         table = dynamo_db.Table('Infomagazine')
 
         dynamo_db_res = table.put_item(
             Item={
                 "LandingName": req['LandingName'],
                 "LandingInfo": req['LandingInfo'],
-                "LandingTime": req['LandingTime']
+                "LandingNum": req['LandingNum']
             }
         )
 
@@ -77,7 +70,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
         else:
             return Response(req, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get(self):
+    def get(self, request, *args, **kwargs):
+        print('get self', self)
+        print('get req', request)
+        print('get args', args)
+        print('get kwarg', kwargs)
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
@@ -93,7 +90,31 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
 
         return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
 
+    # def retrieve(self, request, *args, **kwargs):
+    #     print('ret self', self)
+    #     print('ret req', request)
+    #     print('ret args', args)
+    #     print('ret kwarg', kwargs)
+    #     session = boto3.session.Session(
+    #         aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+    #         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+    #         # aws_session_token=config('AWS_SESSION_TOKEN'),
+    #         region_name='ap-northeast-2'
+    #     )
+    #
+    #     dynamo_db = session.resource('dynamodb')
+    #
+    #     table = dynamo_db.Table('Infomagazine')
+    #
+    #     dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
+    #
+    #     return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
+
     def list(self, request, *args, **kwargs):
+        print('list self', self)
+        print('list req', request)
+        print('list args', args)
+        print('list kwarg', kwargs)
         manager_queryset = UserAccess.objects.all()
         manager_serializer_class = UserAccessSerializer
         company_queryset = Company.objects.all()
@@ -109,24 +130,28 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
         # Filter object along url params
         # Filter object along url params
         # If list searched as user name
+        manager_filter = []
         manager = self.request.query_params.get('manager', None)
         if manager is not None:
             manager_queryset = manager_queryset.filter(
                 Q(user__full_name__icontains=manager) | Q(user__account__icontains=manager)
             )
             manager_serializer = manager_serializer_class(manager_queryset, many=True)
-            print('manager data', manager_serializer.data)
+            for mans in manager_serializer.data:
+                manager_filter.append(int(json.dumps(mans['user'])))
         else:
             print('manager is none')
 
         # If list searched as company name
+        company_filter = []
         company = self.request.query_params.get('company', None)
         if company is not None:
             company_queryset = company_queryset.filter(
                 Q(name__icontains=company) | Q(sub_name__icontains=company)
             )
             company_serializer = company_serializer_class(company_queryset, many=True)
-            print('company data', company_serializer.data)
+            for coms in company_serializer.data:
+                company_filter.append(int(json.dumps(coms['id'])))
         else:
             print('company is none')
         # Url filter done
@@ -138,14 +163,36 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin):
 
         # Dynamo filter
         # Dynamo filter
+        sign = self.request.query_params.get('sign', None)
         name = self.request.query_params.get('name', None)
-        if name is not None:
+
+        if len(manager_filter) is not 0:
+            print('manager_filter is not 0')
+        else:
+            print('manager_filter is 0')
+        if len(company_filter) is not 0:
+            print('company_filter is not 0')
+            if 2 in company_filter:
+                print('3 is in company')
+        else:
+            print('company filter is 0')
+
+        if sign is not None:
+            sign_param = sign
+            dynamo_db_res = json.dumps(
+                table.scan(
+                    FilterExpression=Key('LandingNum').eq(sign_param)
+                ),
+                cls=DecimalEncoder
+            )
+        elif name is not None:
             name_param = name
             dynamo_db_res = json.dumps(
                 table.scan(
                     FilterExpression=Key('LandingName').eq(name_param)
                 ),
-                cls=DecimalEncoder)
+                cls=DecimalEncoder
+            )
         else:
             dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
         # Dynamo filter end
