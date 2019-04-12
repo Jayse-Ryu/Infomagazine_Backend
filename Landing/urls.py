@@ -7,5 +7,5 @@ router = routers.DefaultRouter()
 router.register('', LandingViewSet, base_name='landing')
 
 urlpatterns = [
-    path('api', include(router.urls))
+    path('api/', include(router.urls))
 ]
