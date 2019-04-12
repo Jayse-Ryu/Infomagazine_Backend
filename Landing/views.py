@@ -109,8 +109,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                 Q(user__full_name__icontains=manager) | Q(user__account__icontains=manager)
             )
             manager_serializer = manager_serializer_class(manager_queryset, many=True)
-            for mans in manager_serializer.data:
-                manager_filter.append(int(json.dumps(mans['user'])))
+            for results in manager_serializer.data:
+                manager_filter.append(int(json.dumps(results['user'])))
 
         # If list searched as company name
         company_filter = []
@@ -120,8 +120,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                 Q(name__icontains=company) | Q(sub_name__icontains=company)
             )
             company_serializer = company_serializer_class(company_queryset, many=True)
-            for coms in company_serializer.data:
-                company_filter.append(int(json.dumps(coms['id'])))
+            for results in company_serializer.data:
+                company_filter.append(int(json.dumps(results['id'])))
         # Url filter done
         # Url filter done
 
@@ -150,20 +150,36 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                 ),
                 cls=DecimalEncoder
             )
-        elif len(manager_filter) is not 0:
-            dynamo_db_res = json.dumps(
-                table.scan(
-                    FilterExpression=Attr('LandingInfo.landing.manager').is_in(manager_filter)
-                ),
-                cls=DecimalEncoder
-            )
-        elif len(company_filter) is not 0:
-            dynamo_db_res = json.dumps(
-                table.scan(
-                    FilterExpression=Attr('LandingInfo.landing.company').is_in(company_filter)
-                ),
-                cls=DecimalEncoder
-            )
+        elif manager is not None:
+            if len(manager_filter) is not 0:
+                dynamo_db_res = json.dumps(
+                    table.scan(
+                        FilterExpression=Attr('LandingInfo.landing.manager').is_in(manager_filter)
+                    ),
+                    cls=DecimalEncoder
+                )
+            else:
+                dynamo_db_res = json.dumps(
+                    table.scan(
+                        FilterExpression=Attr('LandingInfo.landing.manager').eq('none')
+                    ),
+                    cls=DecimalEncoder
+                )
+        elif company is not None:
+            if len(company_filter) is not 0:
+                dynamo_db_res = json.dumps(
+                    table.scan(
+                        FilterExpression=Attr('LandingInfo.landing.company').is_in(company_filter)
+                    ),
+                    cls=DecimalEncoder
+                )
+            else:
+                dynamo_db_res = json.dumps(
+                    table.scan(
+                        FilterExpression=Attr('LandingInfo.landing.company').eq('none')
+                    ),
+                    cls=DecimalEncoder
+                )
         else:
             dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
         # Dynamo filter end
