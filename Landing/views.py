@@ -96,7 +96,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
             # aws_session_token=config('AWS_SESSION_TOKEN'),
-            region_name='ap-northeast-2'
+            region_name='ap-northeast-2',
         )
 
         # Filter object along url params
@@ -138,7 +138,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             sign_param = sign
             dynamo_db_res = json.dumps(
                 table.scan(
-                    FilterExpression=Key('LandingNum').eq(sign_param)
+                    FilterExpression=Attr('LandingNum').eq(sign_param)
+                    # KeyCondition=Key('LandingNum').eq(sign_param)
                 ),
                 cls=DecimalEncoder
             )
@@ -186,6 +187,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         # Dynamo filter end
 
         dynamo_obj = json.loads(dynamo_db_res)
+
         # Add manager, company name in landing table
         for key, possible_values in dynamo_obj.items():
             # Stop for at 'Item' section
@@ -196,11 +198,60 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                     get_company = self.get_company(section['LandingInfo']['landing']['company'])
                     section['LandingInfo']['landing']['manager_name'] = get_manger
                     section['LandingInfo']['landing']['company_name'] = get_company
+            # print('possible', possible_values)
+            ordered = self.bubble_sort(possible_values)
             break
 
         # print('result dynamo db is ', dynamo_obj['Items'])
 
+        # temp = [9, 7, 1, 4, 2, 8, 6, 5, 3]
+
+        # list_prepare = [
+        #     {
+        #         'LandingInfo': 1,
+        #         'LandingName': 'custom test',
+        #         'LandingNum': 4
+        #      },
+        #     {
+        #         'LandingInfo': 2,
+        #         'LandingName': 'wecha',
+        #         'LandingNum': 2
+        #     },
+        #     {
+        #         'LandingInfo': 3,
+        #         'LandingName': 'custom',
+        #         'LandingNum': 9
+        #     }
+        # ]
+
+        # for i in range(len(list_prepare)):
+        #     print(list_prepare[i]['LandingNum'])
+
+        # print(list_prepare[0]['LandingNum'])
+        # print(self.bubble_sort(list_prepare))
+        # print(self.bubble_sort(temp))
+
+        print('ordered', ordered)
+
         return Response(dynamo_obj, status=status.HTTP_200_OK)
+
+    def bubble_sort(self, arr):
+        def swap(i, j):
+            arr[i], arr[j] = arr[j], arr[i]
+
+        n = len(arr)
+        swapped = True
+
+        x = -1
+        while swapped:
+            swapped = False
+            x = x + 1
+            for i in range(1, n - x):
+                if arr[i - 1]['LandingNum'] < arr[i]['LandingNum']:
+                    swap(i - 1, i)
+                    swapped = True
+
+        return arr
 
     def get_manager(self, *args):
         manager_queryset = UserAccess.objects.all()
@@ -239,82 +290,3 @@ class DecimalEncoder(json.JSONEncoder):
 # field type: why string? i want number
 
 # order image url none parse
-
-
-req_body_chk = {
-    'LandingName': 'full landing',
-    'LandingTime': 1554788867806,
-    'LandingInfo': {
-        'landing': {
-            'company': 1,
-            'manager': 2,
-            'name': 'full landing',
-            'title': 'page title is',
-            'header_script': 'header is ',
-            'body_script': 'body is ',
-            'base_url': 'full',
-            'is_hijack': False,
-            'hijack_url': None,
-            'is_active': True,
-            'is_mobile': False,
-            # view has to be a number done
-            'views': None,
-            # has to blank list done
-            'collections': None,
-            'is_banner': False,
-            'banner_url': None,
-            'banner_image': None,
-            'inner_db': True,
-            'font': -1,
-            'is_term': True,
-            'image_term': False,
-            'show_company': False
-        },
-        'term': {
-            'title': 'titititle',
-            'content': 'connn',
-            # empty list?
-            'image': None
-        },
-        'form': [
-            {
-                'sign': 1,
-                'name': 'form1',
-                'bg_color': '#c4f0dd',
-                'tx_color': '#313131'
-            }
-        ],
-        'field': [
-            {
-                'sign': 1,
-                # why became string?
-                'type': '1',
-                'name': 'text',
-                'holder': 'text',
-                'form_group_id': 1,
-                'back_color': '#287BFF',
-                'text_color': '#fafafa',
-                'list': [],
-                'image_data': []
-            }
-        ],
-        'order': [
-            {
-                'sign': 1,
-                'type': 1,
-                'name': 'new layout',
-                'position': {
-                    'x': 230,
-                    'y': 50,
-                    'w': 455,
-                    'h': 345,
-                    'z': 1
-                },
-                'image_data': [],
-                # image url null filter??
-                'image_url': '',
-                'video_type': 1
-            }
-        ]
-    }
-}
