@@ -29,16 +29,26 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             region_name='ap-northeast-2'
         )
 
+        # s3 = session.resource('s3')
+        # s3.upload_file('filename.file', 'rewrite-streaming-dev', 'savename.file')
+
         dynamo_db = session.resource('dynamodb')
         table = dynamo_db.Table('Infomagazine')
 
         dynamo_db_res = table.put_item(
             Item={
-                "LandingName": req['LandingName'],
+                "CompanyNum": req['CompanyNum'],
+                "LandingNum": req['LandingNum'],
                 "LandingInfo": req['LandingInfo'],
-                "LandingNum": req['LandingNum']
+                "UpdatedTime": req['UpdatedTime']
+                # "LandingName": req['LandingName'],
             }
         )
+
+        # this.dynamo_obj.CompanyNum = this.access_obj.company
+        # this.dynamo_obj.LandingNum = this.epoch_time
+        # this.dynamo_obj.UpdatedNum = Date.now()
+        # this.dynamo_obj.LandingInfo = {}
 
         if dynamo_db_res['ResponseMetadata']['HTTPStatusCode'] == 200:
             return Response(req, status=status.HTTP_200_OK)
@@ -196,8 +206,10 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                 for section in possible_values:
                     get_manger = self.get_manager(section['LandingInfo']['landing']['manager'])
                     get_company = self.get_company(section['LandingInfo']['landing']['company'])
+                    collection_amount = len(section['LandingInfo']['landing']['collections'])
                     section['LandingInfo']['landing']['manager_name'] = get_manger
                     section['LandingInfo']['landing']['company_name'] = get_company
+                    section['LandingInfo']['landing']['collection_amount'] = collection_amount
             # print('possible', possible_values)
             ordered = self.bubble_sort(possible_values)
             break
@@ -231,7 +243,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         # print(self.bubble_sort(list_prepare))
         # print(self.bubble_sort(temp))
 
-        print('ordered', ordered)
+        # print('ordered', ordered)
 
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
