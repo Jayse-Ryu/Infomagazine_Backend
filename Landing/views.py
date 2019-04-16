@@ -56,10 +56,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             return Response(req, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, *args, **kwargs):
-        # print('get self', self)
-        # print('get req', request)
-        # print('get args', args)
-        # print('get kwarg', kwargs)
+        print('Get function activated')
 
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
@@ -76,6 +73,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
+        print('Retrieve function activated')
 
         sign_param = json.loads(kwargs['pk'])
 
@@ -96,6 +94,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
+        print('List function activated')
 
         manager_queryset = UserAccess.objects.all()
         manager_serializer_class = UserAccessSerializer
@@ -109,9 +108,45 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             region_name='ap-northeast-2',
         )
 
-        # Filter object along url params
-        # Filter object along url params
-        # If list searched as user name
+        # Dynamo filter start
+        dynamo_db = session.resource('dynamodb')
+        table = dynamo_db.Table('Infomagazine')
+
+        # Get query as follow auth access
+        auth = self.request.query_params.get('auth', None)
+        auth_code = self.request.query_params.get('auth_code', None)
+        init_manager = []
+
+        if auth is not None:
+            if auth in 'staff':
+                print('stafF?', auth)
+                print('code?', auth_code)
+                # scan first here?
+            elif auth in 'manager':
+                print('manager?', auth)
+                print('code?', auth_code)
+                # auth code is organization - get companies, filter as organization id
+                init_company = []
+                init_company_qs = company_queryset
+                init_company_qs.filter(organization__exact=auth_code)
+                init_company_serializer = company_serializer_class(init_company_qs, many=True)
+
+                for results in init_company_serializer.data:
+                    init_company.append(int(json.dumps(results['id'])))
+                print('int company', init_company)
+                # my org's companies partitions
+            elif auth in 'customer':
+                print('customer?', auth)
+                print('code?', auth_code)
+                # only my company partitions
+            elif auth in 'none':
+                print('none auth', auth)
+                print('code?', auth_code)
+                # return none
+        # /Get query as follow auth access/
+
+        # Calculate manager, company ID from Searched parameters
+        # If list searched as manager name
         manager_filter = []
         manager = self.request.query_params.get('manager', None)
         if manager is not None:
@@ -132,12 +167,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             company_serializer = company_serializer_class(company_queryset, many=True)
             for results in company_serializer.data:
                 company_filter.append(int(json.dumps(results['id'])))
-        # Url filter done
-        # Url filter done
-
-        # Dynamo filter start
-        dynamo_db = session.resource('dynamodb')
-        table = dynamo_db.Table('Infomagazine')
+        # /Calculate manager, company ID from Searched parameters/
 
         # Dynamo filter
         # Dynamo filter
@@ -211,7 +241,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                     section['LandingInfo']['landing']['company_name'] = get_company
                     section['LandingInfo']['landing']['collection_amount'] = collection_amount
             # print('possible', possible_values)
-            ordered = self.bubble_sort(possible_values)
+            # ordered = self.bubble_sort(possible_values)
             break
 
         # print('result dynamo db is ', dynamo_obj['Items'])
@@ -247,23 +277,23 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
 
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
-    def bubble_sort(self, arr):
-        def swap(i, j):
-            arr[i], arr[j] = arr[j], arr[i]
-
-        n = len(arr)
-        swapped = True
-
-        x = -1
-        while swapped:
-            swapped = False
-            x = x + 1
-            for i in range(1, n - x):
-                if arr[i - 1]['LandingNum'] < arr[i]['LandingNum']:
-                    swap(i - 1, i)
-                    swapped = True
-
-        return arr
+    # def bubble_sort(self, arr):
+    #     def swap(i, j):
+    #         arr[i], arr[j] = arr[j], arr[i]
+    #
+    #     n = len(arr)
+    #     swapped = True
+    #
+    #     x = -1
+    #     while swapped:
+    #         swapped = False
+    #         x = x + 1
+    #         for i in range(1, n - x):
+    #             if arr[i - 1]['LandingNum'] < arr[i]['LandingNum']:
+    #                 swap(i - 1, i)
+    #                 swapped = True
+    #
+    #     return arr
 
     def get_manager(self, *args):
         manager_queryset = UserAccess.objects.all()
