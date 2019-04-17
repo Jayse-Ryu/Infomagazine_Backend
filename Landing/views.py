@@ -115,20 +115,19 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         # Get query as follow auth access
         auth = self.request.query_params.get('auth', None)
         auth_code = self.request.query_params.get('auth_code', None)
-        init_manager = []
+        init_company = []
 
         if auth is not None:
             if auth in 'staff':
-                print('stafF?', auth)
+                print('auth staff?', auth)
                 print('code?', auth_code)
                 # scan first here?
             elif auth in 'manager':
-                print('manager?', auth)
+                print('auth manager?', auth)
                 print('code?', auth_code)
-                # auth code is organization - get companies, filter as organization id
-                init_company = []
-                init_company_qs = company_queryset
-                init_company_qs.filter(organization__exact=auth_code)
+                init_company_qs = Company.objects.all()
+                init_company_qs = init_company_qs.filter(organization__exact=auth_code)
+                print('init com qs', init_company_qs)
                 init_company_serializer = company_serializer_class(init_company_qs, many=True)
 
                 for results in init_company_serializer.data:
@@ -136,11 +135,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                 print('int company', init_company)
                 # my org's companies partitions
             elif auth in 'customer':
-                print('customer?', auth)
+                print('auth customer?', auth)
                 print('code?', auth_code)
                 # only my company partitions
             elif auth in 'none':
-                print('none auth', auth)
+                print('auth none?', auth)
                 print('code?', auth_code)
                 # return none
         # /Get query as follow auth access/
