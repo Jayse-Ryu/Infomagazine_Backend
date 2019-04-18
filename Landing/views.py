@@ -69,7 +69,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     def retrieve(self, request, *args, **kwargs):
         print('Retrieve function activated')
 
-        sign_param = json.loads(kwargs['pk'])
+        sign_param = str(json.loads(kwargs['pk']))
+        print(sign_param)
 
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
@@ -81,11 +82,14 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         dynamo_db = session.resource('dynamodb')
         table = dynamo_db.Table('Infomagazine')
 
-        dynamo_db_res = json.dumps(table.scan(
-            FilterExpression=Key('LandingNum').eq(sign_param)
-        ), cls=DecimalEncoder)
+        dynamo_db_res = \
+            table.query(
+                IndexName='LandingNum-index',
+                KeyConditionExpression=Key('LandingNum').eq(sign_param),
+                ScanIndexForward=False
+            )
 
-        return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
+        return Response(dynamo_db_res, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         print('List function activated')
@@ -107,20 +111,22 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         table = dynamo_db.Table('Infomagazine')
 
         # Get params from url
+        # Authorization
         auth = self.request.query_params.get('auth', None)
         auth_code = self.request.query_params.get('auth_code', None)
+
+        # Search params
         manager = self.request.query_params.get('manager', None)
         company = self.request.query_params.get('company', None)
-        sign = self.request.query_params.get('sign', None)
         name = self.request.query_params.get('name', None)
-        # List for filtered serializer
+
+        # List for serializer
         init_company = []
         manager_filter = []
         company_filter = []
-        # dynomo_db_res = ''
         dynamo_obj = []
 
-        # Get list of manager or company
+        # Get list of manager or company as params
         if manager is not None:
             manager_queryset = manager_queryset.filter(
                 Q(user__full_name__icontains=manager) | Q(user__account__icontains=manager)
@@ -128,8 +134,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             manager_serializer = manager_serializer_class(manager_queryset, many=True)
             for results in manager_serializer.data:
                 manager_filter.append(int(json.dumps(results['user'])))
-
-        # If list searched as company name
 
         if company is not None:
             company_queryset = company_queryset.filter(
@@ -141,22 +145,68 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
 
         if auth is not None:
             if auth in 'staff':
+                # Filtering Company as manager's organization
+                init_company_qs = Company.objects.all()
+                init_company_serializer = company_serializer_class(init_company_qs, many=True)
 
+                for results in init_company_serializer.data:
+                    init_company.append(int(json.dumps(results['id'])))
+
+                # Get Search parameters
                 if manager is not None:
-                    print(manager)
-                    # if Items.landing.manager in manager_filter
+                    # Manager search(manager) in all of companies(init_company)
+                    if len(manager_filter) is not 0:
+                        for item_company in init_company:
+                            dynamo_db_res = \
+                                table.query(
+                                    IndexName='CompanyNum-UpdatedTime-index',
+                                    KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                    FilterExpression=Attr('LandingInfo.landing.manager').is_in(manager_filter),
+                                    ScanIndexForward=False
+                                )
+                            if len(dynamo_db_res['Items']) is not 0:
+                                dynamo_obj.append(dynamo_db_res['Items'][0])
 
                 elif company is not None:
-                    print(company)
-                    # if Items.landing.company in company_filter
+                    # Company search(company) in all of company(init_company)
+                    if len(company_filter) is not 0:
+                        for item_company in init_company:
+                            dynamo_db_res = \
+                                table.query(
+                                    IndexName='CompanyNum-UpdatedTime-index',
+                                    KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                    FilterExpression=Attr('LandingInfo.landing.company').is_in(company_filter),
+                                    ScanIndexForward=False
+                                )
+
+                            if len(dynamo_db_res['Items']) is not 0:
+                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                            # else none
 
                 elif name is not None:
-                    print('query required', name)
-                    # If Items.landing.name i-contains name
+                    # Landing name search in all of company(init_company)
+                    for item_company in init_company:
+                        dynamo_db_res = \
+                            table.query(
+                                IndexName='CompanyNum-UpdatedTime-index',
+                                KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                FilterExpression=Attr('LandingInfo.landing.name').contains(name),
+                                ScanIndexForward=False
+                            )
+                        if len(dynamo_db_res['Items']) is not 0:
+                            dynamo_obj.append(dynamo_db_res['Items'][0])
 
                 else:
-                    print('no searcher. query required')
-                    # get all of landing
+                    # When search parameters not existed, get all of list
+                    for item_company in init_company:
+                        dynamo_db_res = \
+                            table.query(
+                                IndexName='CompanyNum-UpdatedTime-index',
+                                KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                ScanIndexForward=False
+                            )
+                        if len(dynamo_db_res['Items']) is not 0:
+                            dynamo_obj.append(dynamo_db_res['Items'][0])
 
             elif auth in 'manager':
                 # Filtering Company as manager's organization
@@ -212,6 +262,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                             dynamo_obj.append(dynamo_db_res['Items'][0])
 
                 else:
+                    # When search parameters not existed, get all of list from init company
                     for item_company in init_company:
                         dynamo_db_res = \
                             table.query(
@@ -223,80 +274,70 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                             dynamo_obj.append(dynamo_db_res['Items'][0])
 
             elif auth in 'customer':
-                print('auth customer?', auth)
-                print('code?', auth_code)
-                # only my company partitions
+                # Limit Company as customer's company
+                init_company.append(auth_code)
 
                 if manager is not None:
-                    print(manager)
+                    # Manager search(manager) in only my organization's company(init_company)
+                    if len(manager_filter) is not 0:
+                        for item_company in init_company:
+                            dynamo_db_res = \
+                                table.query(
+                                    IndexName='CompanyNum-UpdatedTime-index',
+                                    KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                    FilterExpression=Attr('LandingInfo.landing.manager').is_in(manager_filter),
+                                    ScanIndexForward=False
+                                )
+                            if len(dynamo_db_res['Items']) is not 0:
+                                dynamo_obj.append(dynamo_db_res['Items'][0])
+
                 elif company is not None:
-                    print(company)
+                    # Company search(company) in only my company(init_company)? it looks useless
+                    if len(company_filter) is not 0:
+                        for item_company in init_company:
+                            dynamo_db_res = \
+                                table.query(
+                                    IndexName='CompanyNum-UpdatedTime-index',
+                                    KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                    FilterExpression=Attr('LandingInfo.landing.company').is_in(company_filter),
+                                    ScanIndexForward=False
+                                )
+
+                            if len(dynamo_db_res['Items']) is not 0:
+                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                            # else none
+
                 elif name is not None:
-                    print(name)
+                    # Landing name search in only my company(init_company)
+                    for item_company in init_company:
+                        dynamo_db_res = \
+                            table.query(
+                                IndexName='CompanyNum-UpdatedTime-index',
+                                KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                FilterExpression=Attr('LandingInfo.landing.name').contains(name),
+                                ScanIndexForward=False
+                            )
+                        if len(dynamo_db_res['Items']) is not 0:
+                            dynamo_obj.append(dynamo_db_res['Items'][0])
+
                 else:
-                    print('no searcher')
+                    # When search parameters not existed, get all of list from my company
+                    for item_company in init_company:
+                        dynamo_db_res = \
+                            table.query(
+                                IndexName='CompanyNum-UpdatedTime-index',
+                                KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                ScanIndexForward=False
+                            )
+                        if len(dynamo_db_res['Items']) is not 0:
+                            dynamo_obj.append(dynamo_db_res['Items'][0])
+
             elif auth in 'none':
                 print('auth none?', auth)
                 print('code?', auth_code)
                 # return none
-        # /Get query as follow auth access/
 
-        # Calculate manager, company ID from Searched parameters
-        # If list searched as manager name
-
-        # if sign is not None:
-        #     sign_param = sign
-        #     dynamo_db_res = json.dumps(
-        #         table.scan(
-        #             FilterExpression=Attr('LandingNum').eq(sign_param)
-        #         ),
-        #         cls=DecimalEncoder
-        #     )
-        # elif name is not None:
-        #     name_param = name
-        #     dynamo_db_res = json.dumps(
-        #         table.scan(
-        #             FilterExpression=Attr('LandingName').contains(name_param)
-        #         ),
-        #         cls=DecimalEncoder
-        #     )
-        # elif manager is not None:
-        #     if len(manager_filter) is not 0:
-        #         dynamo_db_res = json.dumps(
-        #             table.scan(
-        #                 FilterExpression=Attr('LandingInfo.landing.manager').is_in(manager_filter)
-        #             ),
-        #             cls=DecimalEncoder
-        #         )
-        #     else:
-        #         dynamo_db_res = json.dumps(
-        #             table.scan(
-        #                 FilterExpression=Attr('LandingInfo.landing.manager').eq('none')
-        #             ),
-        #             cls=DecimalEncoder
-        #         )
-        # elif company is not None:
-        #     if len(company_filter) is not 0:
-        #         dynamo_db_res = json.dumps(
-        #             table.scan(
-        #                 FilterExpression=Attr('LandingInfo.landing.company').is_in(company_filter)
-        #             ),
-        #             cls=DecimalEncoder
-        #         )
-        #     else:
-        #         dynamo_db_res = json.dumps(
-        #             table.scan(
-        #                 FilterExpression=Attr('LandingInfo.landing.company').eq('none')
-        #             ),
-        #             cls=DecimalEncoder
-        #         )
-        # else:
-        #     dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
-        # # Dynamo filter end
-        # # Dynamo filter end
-        #
-        # dynamo_obj = json.loads(dynamo_db_res)
-
+        # Add company name and manager name in list
         for tem in dynamo_obj:
             get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
             get_company = self.get_company(tem['LandingInfo']['landing']['company'])
@@ -324,24 +365,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         company_serializer = company_serializer_class(company_queryset, many=True)
         for item in company_serializer.data:
             return item['name']
-
-    # def bubble_sort(self, arr):
-    #     def swap(i, j):
-    #         arr[i], arr[j] = arr[j], arr[i]
-    #
-    #     n = len(arr)
-    #     swapped = True
-    #
-    #     x = -1
-    #     while swapped:
-    #         swapped = False
-    #         x = x + 1
-    #         for i in range(1, n - x):
-    #             if arr[i - 1]['LandingNum'] < arr[i]['LandingNum']:
-    #                 swap(i - 1, i)
-    #                 swapped = True
-    #
-    #     return arr
 
 
 class DecimalEncoder(json.JSONEncoder):
