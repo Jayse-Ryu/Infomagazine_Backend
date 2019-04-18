@@ -89,7 +89,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                 ScanIndexForward=False
             )
 
-        return Response(dynamo_db_res, status=status.HTTP_200_OK)
+        dynamo_obj = dynamo_db_res['Items'][0]
+
+        return Response(dynamo_obj, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         print('List function activated')
@@ -203,7 +205,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                             table.query(
                                 IndexName='CompanyNum-UpdatedTime-index',
                                 KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
-                                ScanIndexForward=False
+                                ScanIndexForward=True
                             )
                         if len(dynamo_db_res['Items']) is not 0:
                             dynamo_obj.append(dynamo_db_res['Items'][0])
@@ -346,6 +348,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
             tem['LandingInfo']['landing']['company_name'] = get_company
             tem['LandingInfo']['landing']['collection_amount'] = collection_amount
 
+        self.bubble_sort(dynamo_obj)
+
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
     def get_manager(self, *args):
@@ -365,6 +369,24 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
         company_serializer = company_serializer_class(company_queryset, many=True)
         for item in company_serializer.data:
             return item['name']
+
+    def bubble_sort(self, list):
+            def swap(i, j):
+                list[i], list[j] = list[j], list[i]
+
+            n = len(list)
+            swapped = True
+
+            x = -1
+            while swapped:
+                swapped = False
+                x = x + 1
+                for i in range(1, n - x):
+                    if list[i - 1]['LandingNum'] < list[i]['LandingNum']:
+                        swap(i - 1, i)
+                        swapped = True
+
+            return list
 
 
 class DecimalEncoder(json.JSONEncoder):
