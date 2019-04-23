@@ -16,7 +16,7 @@ from UserAccess.serializers import UserAccessSerializer
 from Company.serializers import CompanySerializer
 
 
-class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
 
     def create(self, request):
 
@@ -167,7 +167,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                     ScanIndexForward=False
                                 )
                             if len(dynamo_db_res['Items']) is not 0:
-                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                                for items in dynamo_db_res['Items']:
+                                    dynamo_obj.append(items)
 
                 elif company is not None:
                     # Company search(company) in all of company(init_company)
@@ -182,7 +183,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 )
 
                             if len(dynamo_db_res['Items']) is not 0:
-                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                                for items in dynamo_db_res['Items']:
+                                    dynamo_obj.append(items)
                             # else none
 
                 elif name is not None:
@@ -196,9 +198,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 ScanIndexForward=False
                             )
                         if len(dynamo_db_res['Items']) is not 0:
-                            dynamo_obj.append(dynamo_db_res['Items'][0])
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
 
                 else:
+                    print('staff has no search param')
                     # When search parameters not existed, get all of list
                     for item_company in init_company:
                         dynamo_db_res = \
@@ -208,7 +212,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 ScanIndexForward=True
                             )
                         if len(dynamo_db_res['Items']) is not 0:
-                            dynamo_obj.append(dynamo_db_res['Items'][0])
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
 
             elif auth in 'manager':
                 # Filtering Company as manager's organization
@@ -232,7 +237,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                     ScanIndexForward=False
                                 )
                             if len(dynamo_db_res['Items']) is not 0:
-                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                                # dynamo_obj.append(dynamo_db_res['Items'][0])
+                                for items in dynamo_db_res['Items']:
+                                    dynamo_obj.append(items)
 
                 elif company is not None:
                     # Company search(company) in only my organization's company(init_company)
@@ -247,7 +254,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 )
 
                             if len(dynamo_db_res['Items']) is not 0:
-                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                                # dynamo_obj.append(dynamo_db_res['Items'][0])
+                                for items in dynamo_db_res['Items']:
+                                    dynamo_obj.append(items)
                             # else none
 
                 elif name is not None:
@@ -261,7 +270,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 ScanIndexForward=False
                             )
                         if len(dynamo_db_res['Items']) is not 0:
-                            dynamo_obj.append(dynamo_db_res['Items'][0])
+                            # dynamo_obj.append(dynamo_db_res['Items'][0])
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
 
                 else:
                     # When search parameters not existed, get all of list from init company
@@ -273,7 +284,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 ScanIndexForward=False
                             )
                         if len(dynamo_db_res['Items']) is not 0:
-                            dynamo_obj.append(dynamo_db_res['Items'][0])
+                            # dynamo_obj.append(dynamo_db_res['Items'][0])
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
 
             elif auth in 'customer':
                 # Limit Company as customer's company
@@ -291,7 +304,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                     ScanIndexForward=False
                                 )
                             if len(dynamo_db_res['Items']) is not 0:
-                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                                # dynamo_obj.append(dynamo_db_res['Items'][0])
+                                for items in dynamo_db_res['Items']:
+                                    dynamo_obj.append(items)
 
                 elif company is not None:
                     # Company search(company) in only my company(init_company)? it looks useless
@@ -306,7 +321,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 )
 
                             if len(dynamo_db_res['Items']) is not 0:
-                                dynamo_obj.append(dynamo_db_res['Items'][0])
+                                # dynamo_obj.append(dynamo_db_res['Items'][0])
+                                for items in dynamo_db_res['Items']:
+                                    dynamo_obj.append(items)
                             # else none
 
                 elif name is not None:
@@ -320,7 +337,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 ScanIndexForward=False
                             )
                         if len(dynamo_db_res['Items']) is not 0:
-                            dynamo_obj.append(dynamo_db_res['Items'][0])
+                            # dynamo_obj.append(dynamo_db_res['Items'][0])
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
 
                 else:
                     # When search parameters not existed, get all of list from my company
@@ -332,7 +351,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                                 ScanIndexForward=False
                             )
                         if len(dynamo_db_res['Items']) is not 0:
-                            dynamo_obj.append(dynamo_db_res['Items'][0])
+                            # dynamo_obj.append(dynamo_db_res['Items'][0])
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
 
             elif auth in 'none':
                 print('auth none?', auth)
@@ -387,6 +408,68 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
                         swapped = True
 
             return list
+
+    # def perform_destroy(self, instance):
+    #     print('Destroy function activated')
+    #     print('delete?')
+    #     print(instance)
+    #     session = boto3.session.Session(
+    #         aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+    #         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+    #         # aws_session_token=config('AWS_SESSION_TOKEN'),
+    #         region_name='ap-northeast-2'
+    #     )
+    #
+    #     dynamo_db = session.resource('dynamodb')
+    #     table = dynamo_db.Table('Infomagazine')
+    #
+    #     table.delete_item(
+    #         Key={
+    #             'LandingNum': instance
+    #         }
+    #     )
+    #     # instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        print('Destroy function activated')
+        sign_param = str(json.loads(kwargs['pk']))
+
+        item_obj = []
+        company_num = 0
+
+        session = boto3.session.Session(
+            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            # aws_session_token=config('AWS_SESSION_TOKEN'),
+            region_name='ap-northeast-2'
+        )
+
+        dynamo_db = session.resource('dynamodb')
+        table = dynamo_db.Table('Infomagazine')
+
+        dynamo_db_res = \
+            table.query(
+                IndexName='LandingNum-index',
+                KeyConditionExpression=Key('LandingNum').eq(sign_param),
+                ScanIndexForward=False
+            )
+
+        if len(dynamo_db_res['Items']) is not 0:
+            item_obj.append(dynamo_db_res['Items'][0])
+
+        company_num = item_obj[0]['CompanyNum']
+
+        if company_num is not 0:
+            table.delete_item(
+                Key={
+                    'CompanyNum': company_num,
+                    'LandingNum': sign_param
+                }
+            )
+            return Response(status=status.HTTP_200_OK)
+        else:
+            print('Fail to get company number')
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class DecimalEncoder(json.JSONEncoder):
