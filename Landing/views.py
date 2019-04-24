@@ -362,12 +362,15 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # Add company name and manager name in list
         for tem in dynamo_obj:
-            get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
-            get_company = self.get_company(tem['LandingInfo']['landing']['company'])
-            collection_amount = len(tem['LandingInfo']['landing']['collections'])
-            tem['LandingInfo']['landing']['manager_name'] = get_manger
-            tem['LandingInfo']['landing']['company_name'] = get_company
-            tem['LandingInfo']['landing']['collection_amount'] = collection_amount
+            if tem['LandingInfo']['landing']['name'] is None:
+                dynamo_obj.remove(tem)
+            else:
+                get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
+                get_company = self.get_company(tem['LandingInfo']['landing']['company'])
+                collection_amount = len(tem['LandingInfo']['landing']['collections'])
+                tem['LandingInfo']['landing']['manager_name'] = get_manger
+                tem['LandingInfo']['landing']['company_name'] = get_company
+                tem['LandingInfo']['landing']['collection_amount'] = collection_amount
 
         self.bubble_sort(dynamo_obj)
 
@@ -406,36 +409,13 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     if list[i - 1]['LandingNum'] < list[i]['LandingNum']:
                         swap(i - 1, i)
                         swapped = True
-
             return list
-
-    # def perform_destroy(self, instance):
-    #     print('Destroy function activated')
-    #     print('delete?')
-    #     print(instance)
-    #     session = boto3.session.Session(
-    #         aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-    #         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
-    #         # aws_session_token=config('AWS_SESSION_TOKEN'),
-    #         region_name='ap-northeast-2'
-    #     )
-    #
-    #     dynamo_db = session.resource('dynamodb')
-    #     table = dynamo_db.Table('Infomagazine')
-    #
-    #     table.delete_item(
-    #         Key={
-    #             'LandingNum': instance
-    #         }
-    #     )
-    #     # instance.delete()
 
     def destroy(self, request, *args, **kwargs):
         print('Destroy function activated')
         sign_param = str(json.loads(kwargs['pk']))
 
         item_obj = []
-        company_num = 0
 
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
@@ -459,7 +439,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         company_num = item_obj[0]['CompanyNum']
 
-        if company_num is not 0:
+        if company_num is not 0 and company_num is not None:
             table.delete_item(
                 Key={
                     'CompanyNum': company_num,
