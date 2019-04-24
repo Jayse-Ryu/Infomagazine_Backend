@@ -70,7 +70,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         print('Retrieve function activated')
 
         sign_param = str(json.loads(kwargs['pk']))
-        print(sign_param)
+        # print(sign_param)
 
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
@@ -90,6 +90,15 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             )
 
         dynamo_obj = dynamo_db_res['Items'][0]
+
+        print('ret dy obj!!!', dynamo_obj['LandingInfo']['landing']['name'])
+
+        get_manger = self.get_manager(dynamo_obj['LandingInfo']['landing']['manager'])
+        get_company = self.get_company(dynamo_obj['LandingInfo']['landing']['company'])
+        collection_amount = len(dynamo_obj['LandingInfo']['landing']['collections'])
+        dynamo_obj['LandingInfo']['landing']['manager_name'] = get_manger
+        dynamo_obj['LandingInfo']['landing']['company_name'] = get_company
+        dynamo_obj['LandingInfo']['landing']['collection_amount'] = collection_amount
 
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
@@ -361,20 +370,21 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 # return none
 
         # Add company name and manager name in list
+        final_result = []
         for tem in dynamo_obj:
-            if tem['LandingInfo']['landing']['name'] is None:
-                dynamo_obj.remove(tem)
-            else:
+            if tem['LandingInfo']['landing']['name'] is not None:
                 get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
                 get_company = self.get_company(tem['LandingInfo']['landing']['company'])
                 collection_amount = len(tem['LandingInfo']['landing']['collections'])
                 tem['LandingInfo']['landing']['manager_name'] = get_manger
                 tem['LandingInfo']['landing']['company_name'] = get_company
                 tem['LandingInfo']['landing']['collection_amount'] = collection_amount
+                final_result.append(tem)
 
-        self.bubble_sort(dynamo_obj)
+        # self.bubble_sort(dynamo_obj)
+        self.bubble_sort(final_result)
 
-        return Response(dynamo_obj, status=status.HTTP_200_OK)
+        return Response(final_result, status=status.HTTP_200_OK)
 
     def get_manager(self, *args):
         manager_queryset = UserAccess.objects.all()
