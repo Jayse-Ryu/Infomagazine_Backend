@@ -125,6 +125,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         # Authorization
         auth = self.request.query_params.get('auth', None)
         auth_code = self.request.query_params.get('auth_code', None)
+        main = self.request.query_params.get('main', None)
 
         # Search params
         manager = self.request.query_params.get('manager', None)
@@ -205,6 +206,19 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
                                 FilterExpression=Attr('LandingInfo.landing.name').contains(name),
                                 ScanIndexForward=False
+                            )
+                        if len(dynamo_db_res['Items']) is not 0:
+                            for items in dynamo_db_res['Items']:
+                                dynamo_obj.append(items)
+
+                elif main is not None:
+                    for item_company in init_company:
+                        dynamo_db_res = \
+                            table.query(
+                                IndexName='CompanyNum-UpdatedTime-index',
+                                KeyConditionExpression=Key('CompanyNum').eq(str(item_company)),
+                                FilterExpression=Attr('LandingInfo.landing.base_url').eq(main),
+                                ScanIndexForward=True
                             )
                         if len(dynamo_db_res['Items']) is not 0:
                             for items in dynamo_db_res['Items']:
