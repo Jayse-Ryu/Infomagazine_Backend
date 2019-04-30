@@ -100,6 +100,10 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         dynamo_obj['LandingInfo']['landing']['company_name'] = get_company
         dynamo_obj['LandingInfo']['landing']['collection_amount'] = collection_amount
 
+        preview = self.request.query_params.get('preview', None)
+        if preview is not None:
+            self.create_html(dynamo_obj)
+
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
@@ -474,6 +478,20 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             print('Fail to get company number')
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def create_html(self, request, *args, **kwargs):
+        print('how to run create_html', request)
+        landing = args
+        contents = '''
+        <!DOCTYPE html>
+        <html lang="en">
+        
+        <head>
+          <meta charset="UTF-8">
+          <title>
+        '''
+        title = 'title'
+        contents = contents + title
 
 
 class DecimalEncoder(json.JSONEncoder):
