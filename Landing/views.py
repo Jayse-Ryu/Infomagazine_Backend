@@ -91,7 +91,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         dynamo_obj = dynamo_db_res['Items'][0]
 
-        print('ret dy obj!!!', dynamo_obj['LandingInfo']['landing']['name'])
+        print('ret by obj', dynamo_obj['LandingInfo']['landing']['name'])
 
         get_manger = self.get_manager(dynamo_obj['LandingInfo']['landing']['manager'])
         get_company = self.get_company(dynamo_obj['LandingInfo']['landing']['company'])
@@ -102,7 +102,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         preview = self.request.query_params.get('preview', None)
         if preview is not None:
-            self.create_html(dynamo_obj)
+            self.create_html(json.loads(json.dumps(dynamo_obj, cls=DecimalEncoder)))
+            return Response(status=status.HTTP_200_OK)
 
         return Response(dynamo_obj, status=status.HTTP_200_OK)
 
@@ -479,19 +480,27 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             print('Fail to get company number')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def create_html(self, request, *args, **kwargs):
-        print('how to run create_html', request)
-        landing = args
-        contents = '''
+    def create_html(self, landing):
+        print('updated time?', landing['LandingInfo']['landing'])
+        landing_info = landing['LandingInfo']['landing']
+
+        if landing_info['title'] is not None:
+            title = (landing_info['title'])
+        else:
+            title = '페이지'
+
+        print('final title is = ', title)
+
+        contents = f'''
         <!DOCTYPE html>
         <html lang="en">
         
         <head>
           <meta charset="UTF-8">
-          <title>
+          <title>{title}</title>
         '''
-        title = 'title'
-        contents = contents + title
+
+        print('print contents', contents)
 
 
 class DecimalEncoder(json.JSONEncoder):
