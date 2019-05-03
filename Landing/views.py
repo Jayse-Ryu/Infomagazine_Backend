@@ -481,9 +481,14 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def create_html(self, landing):
-        print('updated time?', landing['LandingInfo']['landing'])
+        # company_num = landing['CompanyNum']
+        # landing_num = landing['LandingNum']
         landing_info = landing['LandingInfo']['landing']
-        print('full landing is? ', landing)
+        # landing_term = landing['LandingInfo']['term']
+        # landing_form = landing['LandingInfo']['form']
+        # landing_field = landing['LandingInfo']['field']
+        # landing_order = landing['LandingInfo']['order']
+
         temp = {
             'manager': 4,
             'manager_name': 'Manager2',
