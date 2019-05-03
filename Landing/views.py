@@ -424,21 +424,21 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             return item['name']
 
     def bubble_sort(self, list):
-            def swap(i, j):
-                list[i], list[j] = list[j], list[i]
+        def swap(i, j):
+            list[i], list[j] = list[j], list[i]
 
-            n = len(list)
-            swapped = True
+        n = len(list)
+        swapped = True
 
-            x = -1
-            while swapped:
-                swapped = False
-                x = x + 1
-                for i in range(1, n - x):
-                    if list[i - 1]['LandingNum'] < list[i]['LandingNum']:
-                        swap(i - 1, i)
-                        swapped = True
-            return list
+        x = -1
+        while swapped:
+            swapped = False
+            x = x + 1
+            for i in range(1, n - x):
+                if list[i - 1]['LandingNum'] < list[i]['LandingNum']:
+                    swap(i - 1, i)
+                    swapped = True
+        return list
 
     def destroy(self, request, *args, **kwargs):
         print('Destroy function activated')
@@ -483,13 +483,104 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
     def create_html(self, landing):
         print('updated time?', landing['LandingInfo']['landing'])
         landing_info = landing['LandingInfo']['landing']
+        print('full landing is? ', landing)
+        temp = {
+            'manager': 4,
+            'manager_name': 'Manager2',
+            'company': 4,
+            'company_name': 'up2 customer',
+            'show_company': False,
+            'name': 'mana2lan',
+            # 'title': None,
 
+            'base_url': 'main',
+
+            # 'header_script': None,
+            # 'body_script': None,
+
+            'inner_db': True,
+
+            # 'is_hijack': False,
+            # 'hijack_url': None,
+
+            'is_banner': False,
+            'banner_url': None,
+            'banner_image': None,
+
+            'is_term': False,
+            'image_term': False,
+
+            'collections': [],
+            'collection_amount': 0,
+
+            'views': 0,
+            # 'is_active': True,
+            # 'is_mobile': False,
+
+            'font': -1
+        }
+
+        # ## Page Title
         if landing_info['title'] is not None:
             title = (landing_info['title'])
         else:
             title = '페이지'
 
-        print('final title is = ', title)
+        # ## Landing activated
+        if landing_info['is_active'] is True:
+            is_active = '''
+                // This landing is not Active
+                location.replace('https://www.google.com/')
+            '''
+        else:
+            is_active = ''
+
+        # ## Page mobile filter in head script
+        if landing_info['is_mobile'] is True:
+            is_mobile = '''
+            // Mobile only
+            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                // document.addEventListener("DOMContentLoaded", function(event) { }
+                alert('is Mobile!')
+            } else {
+                alert('is not Mobile')
+                location.replace('https://www.google.com/')
+            }
+            '''
+        else:
+            is_mobile = ''
+
+        if landing_info['is_hijack'] is True:
+            if landing_info['hijack_url'] is not None:
+                hijack = '''
+                history.replaceState(null, document.title, location.pathname+"#!/stealingyourhistory");
+                history.pushState(null, document.title, location.pathname);
+    
+                window.addEventListener("popstate", function() {
+                    if(location.hash === "#!/stealingyourhistory") {
+                        history.replaceState(null, document.title, location.pathname);
+                        setTimeout(function(){
+                            location.replace("''' + landing_info['hijack_url'] + ''''");
+                        },0);
+                    }
+                }, false);
+                '''
+            else:
+                hijack = ''
+        else:
+            hijack = ''
+
+        # ## Header script
+        if landing_info['header_script'] is not None:
+            header_script = landing_info['body_script']
+        else:
+            header_script = ''
+
+        # ## Body script
+        if landing_info['body_script'] is not None:
+            body_script = landing_info['body_script']
+        else:
+            body_script = ''
 
         contents = f'''
         <!DOCTYPE html>
@@ -497,7 +588,39 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         
         <head>
           <meta charset="UTF-8">
-          <title>{title}</title>
+          <title>{ title }</title>
+          <script>
+            { is_active }
+            { is_mobile }
+            { header_script }
+          </script>
+        </head>
+        <body>
+            <main>
+                <div class="overall_wrap">
+                    <section>
+                    </section>
+
+                    <footer>
+                    
+                    </footer>
+                </div> <!-- /div overall wrap -->
+            </main>
+        
+            <!-- Body script -->
+            <script>
+                { hijack }
+                { body_script }
+                let num = 254
+                let hex = 'ef'
+                let tohex = num.toString(16)
+                let tonum = parseInt(hex, 16)
+                console.log('tohex = ', tohex, 'tonum = ', tonum)
+                console.log('Do it on python. not vue.')
+            </script>
+            <!-- /Body script -->
+        </body>
+        </html>
         '''
 
         print('print contents', contents)
