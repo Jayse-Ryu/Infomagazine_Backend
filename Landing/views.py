@@ -481,13 +481,13 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def create_html(self, landing):
-        # company_num = landing['CompanyNum']
-        # landing_num = landing['LandingNum']
+        company_num = landing['CompanyNum']
+        landing_num = landing['LandingNum']
         landing_info = landing['LandingInfo']['landing']
-        # landing_term = landing['LandingInfo']['term']
-        # landing_form = landing['LandingInfo']['form']
-        # landing_field = landing['LandingInfo']['field']
-        # landing_order = landing['LandingInfo']['order']
+        landing_term = landing['LandingInfo']['term']
+        landing_form = landing['LandingInfo']['form']
+        landing_field = landing['LandingInfo']['field']
+        landing_order = landing['LandingInfo']['order']
 
         temp = {
             'manager': 4,
@@ -586,6 +586,12 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             body_script = landing_info['body_script']
         else:
             body_script = ''
+
+        if len(landing_order) is not 0:
+            for order in landing_order:
+                print('order object', order)
+        else:
+            print('order len 0', landing_order)
 
         contents = f'''
         <!DOCTYPE html>
