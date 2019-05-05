@@ -533,12 +533,12 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # ## Landing activated
         if landing_info['is_active'] is True:
+            is_active = ''
+        else:
             is_active = '''
                 // This landing is not Active
                 location.replace('https://www.google.com/')
             '''
-        else:
-            is_active = ''
 
         # ## Page mobile filter in head script
         if landing_info['is_mobile'] is True:
@@ -555,6 +555,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             is_mobile = ''
 
+        # ## Hijack function
         if landing_info['is_hijack'] is True:
             if landing_info['hijack_url'] is not None:
                 hijack = '''
@@ -587,56 +588,52 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             body_script = ''
 
+        # ## Order objects
         if len(landing_order) is not 0:
             order_obj = ''
-            # image or form-group or video
             for order in landing_order:
-                print('order item', order['type'])
+                # Order is image
                 if order['type'] is 1:
-                    # Order is image
                     order_obj += f'''
                         <section id="section_{ order['sign'] }" 
                                  style="margin-top: { order['position']['y'] / 10 }%; 
                                  left: { order['position']['x'] / 10 }%; 
                                  width: { order['position']['w'] / 10 }%; 
-                                 padding-bottom: { order['position']['h'] / 10 }%; 
-                                 background-color: #ffffff;">
-                            <figure>
-                              <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
-                            </figure>
-                            <!-- 생년월일, 남녀// 이름 // 전화// 7세이하 자녀 // 개인동의 // 상담신 -->
-                        </section>
+                                 padding-bottom: { order['position']['h'] / 10 }%;">'''
+
+                    order_obj += '''
+                        <figure>
+                          <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
+                        </figure>
                     '''
 
+                    order_obj += '''
+                        </section>
+                    '''
+                # Order is form-group
                 elif order['type'] is 2:
-                    # Order is form-group
                     order_obj += f'''
                         <section id="section_{ order['sign'] }" 
                                  style="margin-top: { order['position']['y'] / 10 }%; 
                                  left: { order['position']['x'] / 10 }%; 
                                  width: { order['position']['w'] / 10 }%; 
                                  padding-bottom: { order['position']['h'] / 10 }%; 
-                                 background-color: #ffffff;">
-                            <figure>
-                              <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
-                            </figure>
-                            <!-- 생년월일, 남녀// 이름 // 전화// 7세이하 자녀 // 개인동의 // 상담신 -->
+                                 background-color: #ffffff;">'''
+
+                    order_obj += '''
                         </section>
                     '''
 
+                # Order is video
                 elif order ['type'] is 3:
-                    # Order is video
                     order_obj += f'''
                         <section id="section_{ order['sign'] }" 
                                  style="margin-top: { order['position']['y'] / 10 }%; 
                                  left: { order['position']['x'] / 10 }%; 
                                  width: { order['position']['w'] / 10 }%; 
-                                 padding-bottom: { order['position']['h'] / 10 }%; 
-                                 background-color: #ffffff;">
-                            <figure>
-                              <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
-                            </figure>
-                            <!-- 생년월일, 남녀// 이름 // 전화// 7세이하 자녀 // 개인동의 // 상담신 -->
+                                 padding-bottom: { order['position']['h'] / 10 }%;">'''
+
+                    order_obj += '''
                         </section>
                     '''
 
@@ -673,12 +670,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             <script>
                 { hijack }
                 { body_script }
-                let num = 254
-                let hex = 'ef'
-                let tohex = num.toString(16)
-                let tonum = parseInt(hex, 16)
-                console.log('tohex = ', tohex, 'tonum = ', tonum)
-                console.log('Do it on python. not vue.')
             </script>
             <!-- /Body script -->
         </body>
