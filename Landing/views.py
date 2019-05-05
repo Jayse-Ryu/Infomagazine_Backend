@@ -588,8 +588,59 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             body_script = ''
 
         if len(landing_order) is not 0:
+            order_obj = ''
+            # image or form-group or video
             for order in landing_order:
-                print('order object', order)
+                print('order item', order['type'])
+                if order['type'] is 1:
+                    # Order is image
+                    order_obj += f'''
+                        <section id="section_{ order['sign'] }" 
+                                 style="margin-top: { order['position']['y'] / 10 }%; 
+                                 left: { order['position']['x'] / 10 }%; 
+                                 width: { order['position']['w'] / 10 }%; 
+                                 padding-bottom: { order['position']['h'] / 10 }%; 
+                                 background-color: #ffffff;">
+                            <figure>
+                              <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
+                            </figure>
+                            <!-- 생년월일, 남녀// 이름 // 전화// 7세이하 자녀 // 개인동의 // 상담신 -->
+                        </section>
+                    '''
+
+                elif order['type'] is 2:
+                    # Order is form-group
+                    order_obj += f'''
+                        <section id="section_{ order['sign'] }" 
+                                 style="margin-top: { order['position']['y'] / 10 }%; 
+                                 left: { order['position']['x'] / 10 }%; 
+                                 width: { order['position']['w'] / 10 }%; 
+                                 padding-bottom: { order['position']['h'] / 10 }%; 
+                                 background-color: #ffffff;">
+                            <figure>
+                              <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
+                            </figure>
+                            <!-- 생년월일, 남녀// 이름 // 전화// 7세이하 자녀 // 개인동의 // 상담신 -->
+                        </section>
+                    '''
+
+                elif order ['type'] is 3:
+                    # Order is video
+                    order_obj += f'''
+                        <section id="section_{ order['sign'] }" 
+                                 style="margin-top: { order['position']['y'] / 10 }%; 
+                                 left: { order['position']['x'] / 10 }%; 
+                                 width: { order['position']['w'] / 10 }%; 
+                                 padding-bottom: { order['position']['h'] / 10 }%; 
+                                 background-color: #ffffff;">
+                            <figure>
+                              <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
+                            </figure>
+                            <!-- 생년월일, 남녀// 이름 // 전화// 7세이하 자녀 // 개인동의 // 상담신 -->
+                        </section>
+                    '''
+
+            print('order_obj done is?', order_obj)
         else:
             print('order len 0', landing_order)
 
