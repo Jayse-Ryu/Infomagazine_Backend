@@ -594,12 +594,13 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             for order in landing_order:
                 # Order is image
                 if order['type'] is 1:
+                    # order['image_url'], order['image_data']
                     order_obj += f'''
-                        <section id="section_{ order['sign'] }" 
-                                 style="margin-top: { order['position']['y'] / 10 }%; 
-                                 left: { order['position']['x'] / 10 }%; 
-                                 width: { order['position']['w'] / 10 }%; 
-                                 padding-bottom: { order['position']['h'] / 10 }%;">'''
+                        <section id="section_{order['sign']}" 
+                                 style="margin-top: {order['position']['y'] / 10}%; 
+                                 left: {order['position']['x'] / 10}%; 
+                                 width: {order['position']['w'] / 10}%; 
+                                 padding-bottom: {order['position']['h'] / 10}%;">'''
 
                     order_obj += '''
                         <figure>
@@ -612,68 +613,183 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     '''
                 # Order is form-group
                 elif order['type'] is 2:
-                    order_obj += f'''
-                        <section id="section_{ order['sign'] }" 
-                                 style="margin-top: { order['position']['y'] / 10 }%; 
-                                 left: { order['position']['x'] / 10 }%; 
-                                 width: { order['position']['w'] / 10 }%; 
-                                 padding-bottom: { order['position']['h'] / 10 }%; 
-                                 background-color: #ffffff;">'''
+                    # order['form_group']
+                    form_exist_flag = False
+
+                    for form in landing_form:
+                        if form['sign'] is order['form_group']:
+                            form_exist_flag = True
+                            bg_color = str(int(form['bg_color'].lstrip('#'), 16))
+                            tx_color = form['tx_color'].lstrip('#')
+                            opacity = int(form['opacity']) / 10
+                            break
+
+                    if form_exist_flag is True:
+                        order_obj += f'''
+                        <section id="section_{order['sign']}" 
+                                 style="margin-top: {order['position']['y'] / 10}%; 
+                                 left: {order['position']['x'] / 10}%; 
+                                 width: {order['position']['w'] / 10}%; 
+                                 padding-bottom: {order['position']['h'] / 10}%;
+                                 background-color: rgba({bg_color[0:3]}, {bg_color[3:6]}, 
+                                 {bg_color[6:9]}, {opacity});
+                                 color: #{tx_color};">
+                        '''
+                        for field in landing_field:
+                            if field['form_group_id'] is order['form_group']:
+                                if field['type'] is 1:
+                                    # 1 text, name, holder, label(t,f)
+                                    print('field is text')
+
+                                elif field['type'] is 2:
+                                    # 2 num, same
+                                    print('field is number')
+
+                                elif field['type'] is 3:
+                                    # 3 scr, list
+                                    print('field is scr')
+
+                                elif field['type'] is 4:
+                                    # 4 radio, list
+                                    print('field is radio')
+
+                                elif field['type'] is 5:
+                                    # 5 chk, list
+                                    print('field is chk')
+
+                                elif field['type'] is 6:
+                                    # 6 date, ?
+                                    print('field is date')
+
+                                elif field['type'] is 7:
+                                    # 7 link, url
+                                    print('field is link')
+
+                                elif field['type'] is 8:
+                                    # 8 tel, value
+                                    print('field is tel')
+
+                                elif field['type'] is 9:
+                                    # 9 done (not done :D)
+                                    print('field is done')
+
+                    # order_obj += '''
+                    #     <form>
+                    #       <div class="form_wrap">
+                    #
+                    #         <div class="field_wrap box_with_label" style="width: 100%;">
+                    #           <label class="field_label">생일</label>
+                    #           <input type="date">
+                    #         </div>
+                    #
+                    #         <div class="field_wrap radio_without_label" style="width: 100%;">
+                    #
+                    #           <div class="radio_wrap">
+                    #             <label for="radio1_1">
+                    #               <input type="radio" value="남" name="radio1" id="radio1_1">
+                    #               <span class="radio_label">남</span>
+                    #             </label>
+                    #             <label for="radio1_2">
+                    #               <input type="radio" value="여" name="radio1" id="radio1_2">
+                    #               <span class="radio_label">여</span>
+                    #             </label>
+                    #           </div>
+                    #
+                    #         </div>
+                    #
+                    #         <div class="field_wrap radio_with_label" style="width: 100%;">
+                    #           <label class="field_label">지역</label>
+                    #           <div class="radio_wrap">
+                    #             <label for="lo1">
+                    #               <input type="radio" value="서울" name="lo" id="lo1">
+                    #               <span class="radio_label">서울</span>
+                    #             </label>
+                    #             <label for="lo2">
+                    #               <input type="radio" value="부산" name="lo" id="lo2">
+                    #               <span class="radio_label">부산</span>
+                    #             </label>
+                    #             <label for="lo3">
+                    #               <input type="radio" value="울산" name="lo" id="lo3">
+                    #               <span class="radio_label">울산</span>
+                    #             </label>
+                    #             <label for="lo4">
+                    #               <input type="radio" value="광주" name="lo" id="lo4">
+                    #               <span class="radio_label">광주</span>
+                    #             </label>
+                    #           </div>
+                    #         </div>
+                    #
+                    #         <div class="field_wrap box_with_label" style="width: 100%;">
+                    #           <label class="field_label">전화</label>
+                    #           <input type="tel">
+                    #         </div>
+                    #
+                    #       </div>
+                    #       <!-- /form_wrap -->
+                    #     </form>
+                    # '''
 
                     order_obj += '''
                         </section>
                     '''
 
                 # Order is video
-                elif order ['type'] is 3:
+                elif order['type'] is 3:
+                    # order['video_type'], order['video_data]
                     order_obj += f'''
-                        <section id="section_{ order['sign'] }" 
-                                 style="margin-top: { order['position']['y'] / 10 }%; 
-                                 left: { order['position']['x'] / 10 }%; 
-                                 width: { order['position']['w'] / 10 }%; 
-                                 padding-bottom: { order['position']['h'] / 10 }%;">'''
+                        <section id="section_{order['sign']}" 
+                                 style="margin-top: {order['position']['y'] / 10}%; 
+                                 left: {order['position']['x'] / 10}%; 
+                                 width: {order['position']['w'] / 10}%; 
+                                 padding-bottom: {order['position']['h'] / 10}%;">'''
+
+                    order_obj += '''
+                        <div class="video_wrap">
+                            video will be here
+                        </div>
+                    '''
 
                     order_obj += '''
                         </section>
                     '''
 
-            print('order_obj done is?', order_obj)
+                print('order item is =', order)
+            # print('order_obj done is?', order_obj)
         else:
             print('order len 0', landing_order)
 
         contents = f'''
-        <!DOCTYPE html>
-        <html lang="en">
-        
-        <head>
-          <meta charset="UTF-8">
-          <title>{ title }</title>
-          <script>
-            { is_active }
-            { is_mobile }
-            { header_script }
-          </script>
-        </head>
-        <body>
-            <main>
-                <div class="overall_wrap">
-                    <section>
-                    </section>
-
-                    <footer>
-                    
-                    </footer>
-                </div> <!-- /div overall wrap -->
-            </main>
-        
-            <!-- Body script -->
-            <script>
-                { hijack }
-                { body_script }
-            </script>
-            <!-- /Body script -->
-        </body>
-        </html>
+            <!DOCTYPE html>
+            <html lang="en">
+            
+            <head>
+              <meta charset="UTF-8">
+              <title>{title}</title>
+              <script>
+                {is_active}
+                {is_mobile}
+                {header_script}
+              </script>
+            </head>
+            <body>
+                <main>
+                    <div class="overall_wrap">
+                        {order_obj}
+            
+                        <footer>
+                        
+                        </footer>
+                    </div> <!-- /div overall wrap -->
+                </main>
+            
+                <!-- Body script -->
+                <script>
+                    {hijack}
+                    {body_script}
+                </script>
+                <!-- /Body script -->
+            </body>
+            </html>
         '''
 
         print('print contents', contents)
