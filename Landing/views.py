@@ -949,11 +949,38 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                  padding-bottom: {order['position']['h'] / 10}%;
                                  z-index: {order['position']['z']};">'''
 
-                    order_obj += '''
-                        <div class="video_wrap">
-                            video will be here
-                        </div>
-                    '''
+                    print('order[video_type] is ', order['video_type'])
+
+                    if int(order['video_type']) is 1:
+                        # Youtube
+                        print('im in youtube part')
+                        order_obj += f'''
+                            <div class="video_wrap">
+                                <div style=" position: relative; padding-bottom: 56.25%; height:0;">
+                                    <iframe style="width: 100%; height: 100%; top:0; left:0; position: absolute;" 
+                                            type="text/html"
+                                            src="https://www.youtube.com/embed/{order['video_data']}?&playlist=Ra8s0IHng6A&autoplay=0&loop=1&showinfo=0&fs=1&disablekb=1&vq=auto&controls=0&rel=0&iv_load_policy=3&mute=0&playsinline=1&modestbranding=1"
+                                            frameborder="0" volume="1" allowfullscreen webkitallowfullscreen
+                                            mozallowfullscreen>
+                                    </iframe>
+                                </div>
+                            </div>
+                        '''
+                    elif int(order['video_type']) is 2:
+                        # Vimeo
+                        print('im in vimeo part')
+                        order_obj += f'''
+                            <div class="video_wrap">
+                                <div style=" position: relative; padding-bottom: 56.25%; height:0;">
+                                    <iframe style="width: 100%; height: 100%; top:0; left:0; position: absolute;" 
+                                            type="text/html"
+                                            src="https://player.vimeo.com/video/{order['video_data']}?&loop=1" 
+                                            frameborder="0" volume="1" 
+                                            webkitallowfullscreen mozallowfullscreen allowfullscreen>
+                                    </iframe>
+                                </div>
+                            </div>
+                        '''
 
                     order_obj += '''
                         </section>
@@ -1238,7 +1265,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         preview_html = open('./temp.html', 'w')
         preview_html.write(contents)
-        print('preview html is ', open('./temp.html').read())
+        # print('preview html is ', open('./temp.html').read())
         preview_html.close()
 
 
