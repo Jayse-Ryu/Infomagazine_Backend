@@ -626,31 +626,147 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                     if form_exist_flag is True:
                         order_obj += f'''
-                        <section id="section_{order['sign']}" 
-                                 style="margin-top: {order['position']['y'] / 10}%; 
-                                 left: {order['position']['x'] / 10}%; 
-                                 width: {order['position']['w'] / 10}%; 
-                                 padding-bottom: {order['position']['h'] / 10}%;
-                                 background-color: rgba({bg_color[0:3]}, {bg_color[3:6]}, 
-                                 {bg_color[6:9]}, {opacity});
-                                 color: #{tx_color};">
+                            <section id="section_{order['sign']}" 
+                                     style="margin-top: {order['position']['y'] / 10}%; 
+                                     left: {order['position']['x'] / 10}%; 
+                                     width: {order['position']['w'] / 10}%; 
+                                     padding-bottom: {order['position']['h'] / 10}%;
+                                     background-color: rgba({bg_color[0:3]}, {bg_color[3:6]}, 
+                                     {bg_color[6:9]}, {opacity});
+                                     color: #{tx_color};">
+                                <form>
+                                    <div class="form_wrap">
                         '''
                         for field in landing_field:
                             if field['form_group_id'] is order['form_group']:
+                                print('field item', field)
                                 if field['type'] is 1:
                                     # 1 text, name, holder, label(t,f)
-                                    print('field is text')
-
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                            <div class="field_wrap box_with_label" style="width: 100%;">
+                                              <label class="field_label" for="{field['name'] + field['sign']}">
+                                                  {field['name']}
+                                              </label>
+                                              <input type="text" 
+                                                     id="{field['name'] + field['sign']}" 
+                                                     placeholder="{field['holder']}"
+                                                     maxlength="25">
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap box_without_label" style="width: 100%;">
+                                              <input type="text" 
+                                                     id="{field['name'] + field['sign']}" 
+                                                     placeholder="{field['holder']}"
+                                                     maxlength="25">
+                                            </div>
+                                        '''
                                 elif field['type'] is 2:
                                     # 2 num, same
-                                    print('field is number')
-
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                            <div class="field_wrap box_with_label" style="width: 100%;">
+                                              <label class="field_label" for="{field['name'] + field['sign']}">
+                                                  {field['name']}
+                                              </label>
+                                              <input type="number" 
+                                                     id="{field['name'] + field['sign']}" 
+                                                     placeholder="{field['holder']}"
+                                                     maxlength="25">
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap box_without_label" style="width: 100%;">
+                                              <input type="number" 
+                                                     id="{field['name'] + field['sign']}" 
+                                                     placeholder="{field['holder']}"
+                                                     maxlength="25">
+                                            </div>
+                                        '''
                                 elif field['type'] is 3:
                                     # 3 scr, list
-                                    print('field is scr')
-
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                        <div class="field_wrap box_with_label" style="width: 100%;">
+                                          <label class="field_label" for="{field['name'] + field['sign']}">
+                                              {field['name']}
+                                          </label>
+                                          <select id="{field['name'] + field['sign']}">
+                                            <option value="0">{field['holder']}</option>
+                                        '''
+                                        for list_item in field['list']:
+                                            order_obj += f'''
+                                                <option value="{list_item}">{list_item}</option>
+                                            '''
+                                        order_obj += f'''
+                                            </select>
+                                        </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                        <div class="field_wrap box_without_label" style="width: 100%;">
+                                          <select id="{field['name'] + field['sign']}">
+                                            <option value="0">{field['holder']}</option>
+                                        '''
+                                        for list_item in field['list']:
+                                            order_obj += f'''
+                                                <option value="{list_item}">{list_item}</option>
+                                            '''
+                                        order_obj += f'''
+                                            </select>
+                                        </div>
+                                        '''
                                 elif field['type'] is 4:
                                     # 4 radio, list
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                            <div class="field_wrap radio_without_label" style="width: 100%;">
+                                              <div class="radio_wrap">
+                                        '''
+                                        for list_itme in field['list']:
+                                            order_obj += '''
+                                                
+                                            '''
+                                            # <label for="radio1_1">
+                                            #   <input type="radio" value="남" name="radio1" id="radio1_1">
+                                            #   <span class="radio_label">남</span>
+                                            # </label>
+
+                                            # <label for="radio1_2">
+                                            #   <input type="radio" value="여" name="radio1" id="radio1_2">
+                                            #   <span class="radio_label">여</span>
+                                            # </label>
+
+                                        order_obj += '''
+                                              </div>
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap radio_without_label" style="width: 100%;">
+                                              <div class="radio_wrap">
+                                        '''
+                                        for list_itme in field['list']:
+                                            order_obj += '''
+
+                                            '''
+                                            # <label for="radio1_1">
+                                            #   <input type="radio" value="남" name="radio1" id="radio1_1">
+                                            #   <span class="radio_label">남</span>
+                                            # </label>
+
+                                            # <label for="radio1_2">
+                                            #   <input type="radio" value="여" name="radio1" id="radio1_2">
+                                            #   <span class="radio_label">여</span>
+                                            # </label>
+
+                                        order_obj += '''
+                                              </div>
+                                            </div>
+                                        '''
                                     print('field is radio')
 
                                 elif field['type'] is 5:
@@ -672,6 +788,10 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 elif field['type'] is 9:
                                     # 9 done (not done :D)
                                     print('field is done')
+
+                                elif field['type'] is 10:
+                                    # 10 term chk
+                                    print('field is term chk')
 
                     # order_obj += '''
                     #     <form>
@@ -730,6 +850,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     # '''
 
                     order_obj += '''
+                                </div>
+                                <!-- /form_wrap -->
+                            </form>
                         </section>
                     '''
 
