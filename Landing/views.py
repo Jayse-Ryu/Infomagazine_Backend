@@ -578,7 +578,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # ## Header script
         if landing_info['header_script'] is not None:
-            header_script = landing_info['body_script']
+            header_script = landing_info['header_script']
         else:
             header_script = ''
 
@@ -600,7 +600,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                  style="margin-top: {order['position']['y'] / 10}%; 
                                  left: {order['position']['x'] / 10}%; 
                                  width: {order['position']['w'] / 10}%; 
-                                 padding-bottom: {order['position']['h'] / 10}%;">'''
+                                 padding-bottom: {order['position']['h'] / 10}%;
+                                 z-index: {order['position']['z']};">'''
 
                     order_obj += '''
                         <figure>
@@ -619,7 +620,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     for form in landing_form:
                         if form['sign'] is order['form_group']:
                             form_exist_flag = True
-                            bg_color = str(int(form['bg_color'].lstrip('#'), 16))
+                            bg_color = {
+                                'r': str(int(form['bg_color'].lstrip('#')[0:2], 16)),
+                                'g': str(int(form['bg_color'].lstrip('#')[2:4], 16)),
+                                'b': str(int(form['bg_color'].lstrip('#')[4:6], 16))
+                            }
                             tx_color = form['tx_color'].lstrip('#')
                             opacity = int(form['opacity']) / 10
                             break
@@ -631,8 +636,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      left: {order['position']['x'] / 10}%; 
                                      width: {order['position']['w'] / 10}%; 
                                      padding-bottom: {order['position']['h'] / 10}%;
-                                     background-color: rgba({bg_color[0:3]}, {bg_color[3:6]}, 
-                                     {bg_color[6:9]}, {opacity});
+                                     z-index: {order['position']['z']};
+                                     background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
                                      color: #{tx_color};">
                                 <form>
                                     <div class="form_wrap">
@@ -645,11 +650,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                             <div class="field_wrap box_with_label" style="width: 100%;">
-                                              <label class="field_label" for="{field['name'] + field['sign']}">
+                                              <label class="field_label" for="{field['name']}{field['sign']}">
                                                   {field['name']}
                                               </label>
                                               <input type="text" 
-                                                     id="{field['name'] + field['sign']}" 
+                                                     id="{field['name']}{field['sign']}" 
                                                      placeholder="{field['holder']}"
                                                      maxlength="25">
                                             </div>
@@ -658,7 +663,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         order_obj += f'''
                                             <div class="field_wrap box_without_label" style="width: 100%;">
                                               <input type="text" 
-                                                     id="{field['name'] + field['sign']}" 
+                                                     id="{field['name']}{field['sign']}" 
                                                      placeholder="{field['holder']}"
                                                      maxlength="25">
                                             </div>
@@ -668,11 +673,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                             <div class="field_wrap box_with_label" style="width: 100%;">
-                                              <label class="field_label" for="{field['name'] + field['sign']}">
+                                              <label class="field_label" for="{field['name']}{field['sign']}">
                                                   {field['name']}
                                               </label>
                                               <input type="number" 
-                                                     id="{field['name'] + field['sign']}" 
+                                                     id="{field['name']}{field['sign']}" 
                                                      placeholder="{field['holder']}"
                                                      maxlength="25">
                                             </div>
@@ -681,7 +686,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         order_obj += f'''
                                             <div class="field_wrap box_without_label" style="width: 100%;">
                                               <input type="number" 
-                                                     id="{field['name'] + field['sign']}" 
+                                                     id="{field['name']}{field['sign']}" 
                                                      placeholder="{field['holder']}"
                                                      maxlength="25">
                                             </div>
@@ -691,10 +696,10 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                         <div class="field_wrap box_with_label" style="width: 100%;">
-                                          <label class="field_label" for="{field['name'] + field['sign']}">
+                                          <label class="field_label" for="{field['name']}{field['sign']}">
                                               {field['name']}
                                           </label>
-                                          <select id="{field['name'] + field['sign']}">
+                                          <select id="{field['name']}{field['sign']}">
                                             <option value="0">{field['holder']}</option>
                                         '''
                                         for list_item in field['list']:
@@ -708,7 +713,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     else:
                                         order_obj += f'''
                                         <div class="field_wrap box_without_label" style="width: 100%;">
-                                          <select id="{field['name'] + field['sign']}">
+                                          <select id="{field['name']}{field['sign']}">
                                             <option value="0">{field['holder']}</option>
                                         '''
                                         for list_item in field['list']:
@@ -723,59 +728,117 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     # 4 radio, list
                                     if field['label'] is True:
                                         order_obj += f'''
-                                            <div class="field_wrap radio_without_label" style="width: 100%;">
-                                              <div class="radio_wrap">
+                                            <div class="field_wrap list_with_label" style="width: 100%;">
+                                              <label class="field_label">{field['name']}</label>
+                                              <div class="list_wrap">
                                         '''
-                                        for list_itme in field['list']:
-                                            order_obj += '''
-                                                
+                                        for index, list_item in enumerate(field['list']):
+                                            order_obj += f'''
+                                                <span>
+                                                  <input type="radio" 
+                                                         value="{list_item}" 
+                                                         name="radio_{field['sign']}" 
+                                                         id="{field['name']}{field['sign']}{index}">
+                                                  <label class="list_label" for="{field['name']}{field['sign']}{index}">
+                                                    {list_item}
+                                                  </label>
+                                                </span>
                                             '''
-                                            # <label for="radio1_1">
-                                            #   <input type="radio" value="남" name="radio1" id="radio1_1">
-                                            #   <span class="radio_label">남</span>
-                                            # </label>
-
-                                            # <label for="radio1_2">
-                                            #   <input type="radio" value="여" name="radio1" id="radio1_2">
-                                            #   <span class="radio_label">여</span>
-                                            # </label>
-
                                         order_obj += '''
                                               </div>
                                             </div>
                                         '''
                                     else:
                                         order_obj += f'''
-                                            <div class="field_wrap radio_without_label" style="width: 100%;">
-                                              <div class="radio_wrap">
+                                            <div class="field_wrap list_without_label" style="width: 100%;">
+                                              <div class="list_wrap">
                                         '''
-                                        for list_itme in field['list']:
-                                            order_obj += '''
-
+                                        for index, list_item in enumerate(field['list']):
+                                            order_obj += f'''
+                                                <span>
+                                                  <input type="radio" 
+                                                         value="{list_item}" 
+                                                         name="radio_{field['sign']}" 
+                                                         id="{field['name']}{field['sign']}{index}">
+                                                  <label class="list_label" for="{field['name']}{field['sign']}{index}">
+                                                    {list_item}
+                                                  </label>
+                                                </span>
                                             '''
-                                            # <label for="radio1_1">
-                                            #   <input type="radio" value="남" name="radio1" id="radio1_1">
-                                            #   <span class="radio_label">남</span>
-                                            # </label>
-
-                                            # <label for="radio1_2">
-                                            #   <input type="radio" value="여" name="radio1" id="radio1_2">
-                                            #   <span class="radio_label">여</span>
-                                            # </label>
-
                                         order_obj += '''
                                               </div>
                                             </div>
                                         '''
-                                    print('field is radio')
 
                                 elif field['type'] is 5:
                                     # 5 chk, list
-                                    print('field is chk')
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                            <div class="field_wrap list_with_label" style="width: 100%;">
+                                              <label class="field_label">{field['name']}</label>
+                                              <div class="list_wrap">
+                                        '''
+                                        for index, list_item in enumerate(field['list']):
+                                            order_obj += f'''
+                                                <span>
+                                                  <input type="checkbox" 
+                                                         value="{list_item}" 
+                                                         name="radio_{field['sign']}" 
+                                                         id="{field['name']}{field['sign']}{index}">
+                                                  <label class="list_label" for="{field['name']}{field['sign']}{index}">
+                                                    {list_item}
+                                                  </label>
+                                                </span>
+                                            '''
+                                        order_obj += '''
+                                              </div>
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap list_without_label" style="width: 100%;">
+                                              <div class="list_wrap">
+                                        '''
+                                        for index, list_item in enumerate(field['list']):
+                                            order_obj += f'''
+                                                <span>
+                                                  <input type="checkbox" 
+                                                         value="{list_item}" 
+                                                         name="radio_{field['sign']}" 
+                                                         id="{field['name']}{field['sign']}{index}">
+                                                  <label class="list_label" for="{field['name']}{field['sign']}{index}">
+                                                    {list_item}
+                                                  </label>
+                                                </span>
+                                            '''
+                                        order_obj += '''
+                                              </div>
+                                            </div>
+                                        '''
+                                        print('field is chk')
 
                                 elif field['type'] is 6:
                                     # 6 date, ?
                                     print('field is date')
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                            <div class="field_wrap box_with_label" style="width: 100%;">
+                                              <label class="field_label" for="{field['name']}{field['sign']}">
+                                                  {field['name']}
+                                              </label>
+                                              <input type="date" 
+                                                     id="{field['name']}{field['sign']}" 
+                                                     placeholder="{field['holder']}">
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap box_without_label" style="width: 100%;">
+                                              <input type="date" 
+                                                     id="{field['name']}{field['sign']}" 
+                                                     placeholder="{field['holder']}">
+                                            </div>
+                                        '''
 
                                 elif field['type'] is 7:
                                     # 7 link, url
@@ -864,7 +927,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                  style="margin-top: {order['position']['y'] / 10}%; 
                                  left: {order['position']['x'] / 10}%; 
                                  width: {order['position']['w'] / 10}%; 
-                                 padding-bottom: {order['position']['h'] / 10}%;">'''
+                                 padding-bottom: {order['position']['h'] / 10}%;
+                                 z-index: {order['position']['z']};">'''
 
                     order_obj += '''
                         <div class="video_wrap">
@@ -881,6 +945,221 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             print('order len 0', landing_order)
 
+        style_sheet = '''
+          <style type="text/css">
+        /*    @media (min-width: 576px) {  }
+        
+            @media (min-width: 768px) {  }
+        
+            @media (min-width: 992px) {  }
+        
+            @media (min-width: 1200px) {  }*/
+        
+            /* Main */
+            * {
+              -webkit-box-sizing: border-box;
+              -moz-box-sizing: border-box;
+              box-sizing: border-box;
+              font-family: sans-serif;
+            }
+            body {
+              padding: 0;
+              margin: 0;
+              font-size: 1.2em;
+            }
+            main {
+              position: absolute;
+              width: 100%;
+            }
+            /* /Main */
+        
+            /* Responsive Wrap */
+            .overall_wrap {
+              position: relative;
+              width: 100%;
+              min-width: 360px;
+              margin: 0 auto;
+            }
+        
+            @media (max-width: 768px) {
+              * {
+                font-size: 0.9em;
+              }
+        
+              .overall_wrap {
+                max-width: 576px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1200px) {
+              * {
+                font-size: 1em;
+              }
+        
+              .overall_wrap {
+                max-width: 768px;
+              }
+            }
+            @media (min-width: 1201px) {
+              .overall_wrap {
+                max-width: 1000px;
+              }
+            }
+            /* /Responsive Wrap */
+        
+        
+            /* Layout Initial */
+            section {
+              position: absolute;
+              width: 100%;
+            }
+            section form {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              overflow: auto;
+              /*padding: 15px;*/
+            }
+        
+            .form_wrap {
+              position: absolute;
+              width: 100%;
+              padding: 4%;
+              top: 50%;
+              -webkit-transform: translateY(-50%);
+              -moz-transform: translateY(-50%);
+              -ms-transform: translateY(-50%);
+              -o-transform: translateY(-50%);
+              transform: translateY(-50%);
+            }
+        
+            @media (max-width: 768px) {
+              .form_wrap {
+                top: 0;
+                -webkit-transform: none;
+                -moz-transform: none;
+                -ms-transform: none;
+                -o-transform: none;
+                transform: none;
+              }
+            }
+        
+            form input, form select {
+              position: relative;
+              display: inline-block;
+              height: calc(2.25rem + 2px);
+              padding: .375rem .75rem;
+              font-size: 1em;
+              vertical-align: middle;
+              line-height: 1.5;
+              color: #495057;
+              background-color: #fff;
+              border: 1px solid #ced4da;
+              border-radius: .25rem;
+            }
+            input[type=radio], input[type=checkbox] {
+              height: calc(1.9rem + 2px);
+            }
+            form label {
+              vertical-align: top;
+              text-align: center;
+              margin-top: 0.5rem;
+              padding-top: calc(.25rem - 2px);
+              padding-bottom: calc(.25rem + 1px);
+              font-size: .875rem;
+              line-height: 1.5;
+            }
+            figure {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              margin: 0;
+              text-align: center;
+            }
+            figure img {
+              max-width: 100%;
+              max-height: 100%;
+            }
+            /* /Layout Initial */
+        
+            .field_wrap {
+              display: inline-block;
+              margin: 0.5rem 0;
+            }
+        
+            .box_with_label .field_label {
+              display: inline-block;
+              width: calc(25% - 10px);
+            }
+            .box_with_label input, .box_with_label select {
+              width: 75%;
+            }
+        
+            .box_without_label .field_label {
+              display: none;
+            }
+            .box_without_label input, .box_without_label select {
+              width: 100%;
+            }
+        
+            .list_with_label .field_label {
+              display: inline-block;
+              width: calc(25% - 10px);
+            }
+        
+            .list_with_label .list_wrap{
+              display: inline-block;
+              width: 75%;
+              margin-top: 0.5rem;
+              padding-top: calc(.25rem - 2px);
+              padding-bottom: calc(.25rem + 1px);
+            }
+        
+            .list_without_label .field_label {
+              display: none;
+            }
+        
+            .list_without_label .list_wrap{
+              display: inline-block;
+              width: 100%;
+              margin-top: 0.5rem;
+              padding-top: calc(.25rem - 2px);
+              padding-bottom: calc(.25rem + 1px);
+            }
+        
+            .list_label {
+              vertical-align: middle;
+            }
+        
+            @media (max-width: 768px) {
+              .field_wrap {
+                width: 100% !important;
+              }
+        
+              .box_with_label label {
+                width: 100%;
+                display: inline-block;
+                margin-bottom: 0.5rem;
+                text-align: left;
+              }
+              .box_with_label input, .box_with_label select {
+                width: 100%;
+              }
+              
+              .list_with_label .field_label {
+                width: 100%;
+                display: inline-block;
+                margin-bottom: 0.5rem;
+                text-align: left;
+              }
+              
+              .list_with_label .list_wrap {
+                width: 100%;
+              }
+            }
+        
+          </style>
+        '''
+
         contents = f'''
             <!DOCTYPE html>
             <html lang="en">
@@ -893,6 +1172,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 {is_mobile}
                 {header_script}
               </script>
+              {style_sheet}
             </head>
             <body>
                 <main>
