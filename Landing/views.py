@@ -1,3 +1,4 @@
+import os
 import boto3
 import botocore
 from decouple import config
@@ -639,7 +640,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      z-index: {order['position']['z']};
                                      background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
                                      color: #{tx_color};">
-                                <form>
+                                <form onsubmit = "event.preventDefault(); form_submit();">
                                     <div class="form_wrap">
                         '''
                         for field in landing_field:
@@ -842,75 +843,93 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                                 elif field['type'] is 7:
                                     # 7 link, url
-                                    print('field is link')
+                                    if field['image_data'] is None:
+                                        order_obj += f'''
+                                            <div class="field_wrap button_wrap" style="width: 100%;">
+                                                <a href="{field['url']}" target="_blank">
+                                                    <button class="form_button" 
+                                                            type="button"
+                                                            style="
+                                                                background-color: {field['back_color']};
+                                                                color: {field['text_color']}">
+                                                        {field['holder']}
+                                                    </button> 
+                                                </a>
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap button_wrap" style="width: 100%;">
+                                                <a href="{field['url']}">
+                                                    <button class="form_button" type="button">
+                                                        {field['holder']}
+                                                        <img src="" alt="{field['holder']}">
+                                                    </button> 
+                                                </a>
+                                            </div>
+                                        '''
 
                                 elif field['type'] is 8:
                                     # 8 tel, value
-                                    print('field is tel')
+                                    if field['image_data'] is None:
+                                        order_obj += f'''
+                                            <div class="field_wrap button_wrap" style="width: 100%;">
+                                                <a href="tel:{field['value']}">
+                                                    <button class="form_button" 
+                                                            type="button"
+                                                            style="
+                                                                background-color: {field['back_color']};
+                                                                color: {field['text_color']}">
+                                                        {field['holder']}
+                                                    </button>
+                                                </a>
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap button_wrap" style="width: 100%;">
+                                                <a href="tel:{field['value']}">
+                                                    <button class="form_button" type="button">
+                                                        {field['holder']}
+                                                        <img src="" alt="{field['holder']}">
+                                                    </button> 
+                                                </a>
+                                            </div>
+                                        '''
 
                                 elif field['type'] is 9:
                                     # 9 done (not done :D)
-                                    print('field is done')
+                                    if field['image_data'] is None:
+                                        order_obj += f'''
+                                            <div class="field_wrap button_wrap" style="width: 100%;">
+                                                <button class="form_button" 
+                                                        type="submit"
+                                                        style="
+                                                            background-color: {field['back_color']};
+                                                            color: {field['text_color']}">
+                                                    {field['holder']}
+                                                </button> 
+                                            </div>
+                                        '''
+                                    else:
+                                        order_obj += f'''
+                                            <div class="field_wrap button_wrap" style="width: 100%;">
+                                                <button class="form_button" type="submit">
+                                                    <img src="" alt="holder">
+                                                </button> 
+                                            </div>
+                                        '''
 
                                 elif field['type'] is 10:
                                     # 10 term chk
+                                    order_obj += f'''
+                                        <div class="field_wrap term_wrap" style="width: 100%;">
+                                            <input type="checkbox" id="term{field['sign']}">
+                                            <label for="term{field['sign']}">개인정보 수집에 동의합니다.</label>
+                                            <span>[약관보기]</span>
+                                        </div>
+                                    '''
                                     print('field is term chk')
-
-                    # order_obj += '''
-                    #     <form>
-                    #       <div class="form_wrap">
-                    #
-                    #         <div class="field_wrap box_with_label" style="width: 100%;">
-                    #           <label class="field_label">생일</label>
-                    #           <input type="date">
-                    #         </div>
-                    #
-                    #         <div class="field_wrap radio_without_label" style="width: 100%;">
-                    #
-                    #           <div class="radio_wrap">
-                    #             <label for="radio1_1">
-                    #               <input type="radio" value="남" name="radio1" id="radio1_1">
-                    #               <span class="radio_label">남</span>
-                    #             </label>
-                    #             <label for="radio1_2">
-                    #               <input type="radio" value="여" name="radio1" id="radio1_2">
-                    #               <span class="radio_label">여</span>
-                    #             </label>
-                    #           </div>
-                    #
-                    #         </div>
-                    #
-                    #         <div class="field_wrap radio_with_label" style="width: 100%;">
-                    #           <label class="field_label">지역</label>
-                    #           <div class="radio_wrap">
-                    #             <label for="lo1">
-                    #               <input type="radio" value="서울" name="lo" id="lo1">
-                    #               <span class="radio_label">서울</span>
-                    #             </label>
-                    #             <label for="lo2">
-                    #               <input type="radio" value="부산" name="lo" id="lo2">
-                    #               <span class="radio_label">부산</span>
-                    #             </label>
-                    #             <label for="lo3">
-                    #               <input type="radio" value="울산" name="lo" id="lo3">
-                    #               <span class="radio_label">울산</span>
-                    #             </label>
-                    #             <label for="lo4">
-                    #               <input type="radio" value="광주" name="lo" id="lo4">
-                    #               <span class="radio_label">광주</span>
-                    #             </label>
-                    #           </div>
-                    #         </div>
-                    #
-                    #         <div class="field_wrap box_with_label" style="width: 100%;">
-                    #           <label class="field_label">전화</label>
-                    #           <input type="tel">
-                    #         </div>
-                    #
-                    #       </div>
-                    #       <!-- /form_wrap -->
-                    #     </form>
-                    # '''
 
                     order_obj += '''
                                 </div>
@@ -947,7 +966,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         style_sheet = '''
           <style type="text/css">
-        /*    @media (min-width: 576px) {  }
+            /* @media (min-width: 576px) {  }
         
             @media (min-width: 768px) {  }
         
@@ -1109,7 +1128,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             .list_with_label .list_wrap{
               display: inline-block;
               width: 75%;
-              margin-top: 0.5rem;
               padding-top: calc(.25rem - 2px);
               padding-bottom: calc(.25rem + 1px);
             }
@@ -1121,7 +1139,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             .list_without_label .list_wrap{
               display: inline-block;
               width: 100%;
-              margin-top: 0.5rem;
               padding-top: calc(.25rem - 2px);
               padding-bottom: calc(.25rem + 1px);
             }
@@ -1155,6 +1172,30 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               .list_with_label .list_wrap {
                 width: 100%;
               }
+            }
+            
+            .form_button {
+                width: 100%;
+                display: inline-block;
+                font-weight: 400;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                border: 1px solid transparent;
+                padding: .375rem .75rem;
+                font-size: 1rem;
+                line-height: 1.5;
+                cursor: pointer;
+                border-radius: .25rem;
+                transition: opacity .15s ease-in-out;
+            }
+    
+            .form_button:hover {
+                opacity: 0.7;
             }
         
           </style>
@@ -1195,7 +1236,10 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             </html>
         '''
 
-        print('print contents', contents)
+        preview_html = open('./temp.html', 'w')
+        preview_html.write(contents)
+        print('preview html is ', open('./temp.html').read())
+        preview_html.close()
 
 
 class DecimalEncoder(json.JSONEncoder):
