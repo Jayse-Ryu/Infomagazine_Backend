@@ -394,7 +394,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         for tem in dynamo_obj:
             if tem['LandingInfo']['landing']['name'] is not None:
                 get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
-                get_company = self.get_company(tem['LandingInfo']['landing']['company'])
+                get_company = self.get_company(tem['LandingInfo']['landing']['company'])['name']
                 collection_amount = len(tem['LandingInfo']['landing']['collections'])
                 tem['LandingInfo']['landing']['manager_name'] = get_manger
                 tem['LandingInfo']['landing']['company_name'] = get_company
@@ -977,7 +977,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 <div style=" position: relative; padding-bottom: 56.25%; height:0;">
                                     <iframe style="width: 100%; height: 100%; top:0; left:0; position: absolute;" 
                                             type="text/html"
-                                            src="https://www.youtube.com/embed/{order['video_data']}?&playlist=Ra8s0IHng6A&autoplay=0&loop=1&showinfo=0&fs=1&disablekb=1&vq=auto&controls=0&rel=0&iv_load_policy=3&mute=0&playsinline=1&modestbranding=1"
+                                            src="https://www.youtube.com/embed/{order[
+                            'video_data']}?&playlist=Ra8s0IHng6A&autoplay=0&loop=1&showinfo=0&fs=1&disablekb=1&vq=auto&controls=0&rel=0&iv_load_policy=3&mute=0&playsinline=1&modestbranding=1"
                                             frameborder="0" volume="1" allowfullscreen webkitallowfullscreen
                                             mozallowfullscreen>
                                     </iframe>
@@ -1011,8 +1012,22 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         if landing_info['show_company'] is True:
             # print('if show company = get company = ', self.get_company(landing_info['company']))
-            company_obj = self.get_company(landing_info['company'])
-            print('company_obj', company_obj)
+            company_obj = []
+            company_obj = json.dumps(str(self.get_company(landing_info['company'])))
+            # for item in self.get_company(landing_info['company']):
+            #     print('item is ', item)
+            # print('company_obj', company_obj)
+            # footer_obj = f'''
+            #
+            # '''
+            OrderedDict = (
+            [('id', 4), ('organization', 2), ('organization_name', 'Upche for 2'), ('name', 'up2 customer'),
+             ('sub_name', '\uc5c52 \uace0\uac1d'), ('header', 'kwm'),
+             ('address', '101, BUILDING 530, 301 JUNGDONG ST.\u3141\u3134\u3147\u3141\u3134\u3147'), ('corp_num', None),
+             ('phone', None), ('email', 'dgkim723@hotmail.com'), ('desc', None),
+             ('created_date', '2019-04-16T17:25:41.164827'), ('updated_date', '2019-04-16T17:25:41.164849')])
+            for item in OrderedDict:
+                print('order dict item ', item)
 
         # ## Header CSS with font import
         style_sheet = '''
@@ -1092,7 +1107,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             .form_wrap {
               position: absolute;
               width: 100%;
-              padding: 4%;
+              padding: 3%;
               top: 50%;
               -webkit-transform: translateY(-50%);
               -moz-transform: translateY(-50%);
