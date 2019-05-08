@@ -95,7 +95,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         print('ret by obj', dynamo_obj['LandingInfo']['landing']['name'])
 
         get_manger = self.get_manager(dynamo_obj['LandingInfo']['landing']['manager'])
-        get_company = self.get_company(dynamo_obj['LandingInfo']['landing']['company'])
+        get_company = self.get_company(dynamo_obj['LandingInfo']['landing']['company'])['name']
         collection_amount = len(dynamo_obj['LandingInfo']['landing']['collections'])
         dynamo_obj['LandingInfo']['landing']['manager_name'] = get_manger
         dynamo_obj['LandingInfo']['landing']['company_name'] = get_company
@@ -422,7 +422,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         company_queryset = company_queryset.filter(id__exact=args[0])
         company_serializer = company_serializer_class(company_queryset, many=True)
         for item in company_serializer.data:
-            return item['name']
+            return item
 
     def bubble_sort(self, list):
         def swap(i, j):
@@ -496,7 +496,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             'company': 4,
             'company_name': 'up2 customer',
             'show_company': False,
-            'name': 'mana2lan',
+            # 'name': 'mana2lan',
             # 'title': None,
 
             'base_url': 'main',
@@ -523,7 +523,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             # 'is_active': True,
             # 'is_mobile': False,
 
-            'font': -1
+            # 'font': -1
         }
 
         # ## Page Title
@@ -589,6 +589,23 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             body_script = ''
 
+        # ## Landing Font
+        if int(landing_info['font']) is 1:
+            font_link = ''
+            font_name = 'sans-serif'
+        elif int(landing_info['font']) is 2:
+            font_link = '@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);'
+            font_name = 'Nanum Gothic'
+        elif int(landing_info['font']) is 3:
+            font_link = '@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);'
+            font_name = 'Nanum Myeongjo'
+        elif int(landing_info['font']) is 4:
+            font_link = '@import url(http://fonts.googleapis.com/earlyaccess/jejugothic.css);'
+            font_name = 'Jeju Gothic'
+        else:
+            font_link = ''
+            font_name = 'serif'
+
         # ## Order objects
         if len(landing_order) is not 0:
             order_obj = ''
@@ -639,7 +656,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      padding-bottom: {order['position']['h'] / 10}%;
                                      z-index: {order['position']['z']};
                                      background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
-                                     color: #{tx_color};">
+                                     color: #{tx_color};
+                                     font-family: {landing_info['font']};">
                                 <form onsubmit = "event.preventDefault(); form_submit();">
                                     <div class="form_wrap">
                         '''
@@ -991,8 +1009,19 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             print('order len 0', landing_order)
 
+        if landing_info['show_company'] is True:
+            # print('if show company = get company = ', self.get_company(landing_info['company']))
+            company_obj = self.get_company(landing_info['company'])
+            print('company_obj', company_obj)
+
+        # ## Header CSS with font import
         style_sheet = '''
           <style type="text/css">
+          '''
+        style_sheet += f'''
+            {font_link}
+        '''
+        style_sheet += '''
             /* @media (min-width: 576px) {  }
         
             @media (min-width: 768px) {  }
@@ -1005,8 +1034,11 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             * {
               -webkit-box-sizing: border-box;
               -moz-box-sizing: border-box;
-              box-sizing: border-box;
-              font-family: sans-serif;
+              box-sizing: border-box;'''
+        style_sheet += f'''
+              font-family: '{font_name}', serif; 
+        '''
+        style_sheet += '''
             }
             body {
               padding: 0;
@@ -1055,7 +1087,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               width: 100%;
               height: 100%;
               overflow: auto;
-              /*padding: 15px;*/
             }
         
             .form_wrap {
@@ -1228,6 +1259,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
           </style>
         '''
 
+        # ## Render HTML file
         contents = f'''
             <!DOCTYPE html>
             <html lang="en">
