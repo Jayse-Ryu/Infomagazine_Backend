@@ -606,7 +606,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                     order_obj += '''
                         <figure>
-                          <img src="./s3_image/Top_bg_big.jpg" alt="Top_bg_big">
+                          <img src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" alt="Top_bg_big">
                         </figure>
                     '''
 
@@ -925,7 +925,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     order_obj += f'''
                                         <div class="field_wrap term_wrap" style="width: 100%;">
                                             <input type="checkbox" id="term{field['sign']}">
-                                            <label for="term{field['sign']}">개인정보 수집에 동의합니다.</label>
+                                            <label for="term{field['sign']}">{field['holder']}</label>
                                             <span>[약관보기]</span>
                                         </div>
                                     '''
@@ -1031,21 +1031,13 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               * {
                 font-size: 0.9em;
               }
-        
-              .overall_wrap {
-                max-width: 576px;
-              }
             }
-            @media (min-width: 768px) and (max-width: 1200px) {
+            @media (min-width: 768px) and (max-width: 1000px) {
               * {
                 font-size: 1em;
               }
-        
-              .overall_wrap {
-                max-width: 768px;
-              }
             }
-            @media (min-width: 1201px) {
+            @media (min-width: 1001px) {
               .overall_wrap {
                 max-width: 1000px;
               }
@@ -1078,7 +1070,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               transform: translateY(-50%);
             }
         
-            @media (max-width: 768px) {
+            @media (max-width: 1000px) {
               .form_wrap {
                 top: 0;
                 -webkit-transform: none;
@@ -1223,6 +1215,14 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
     
             .form_button:hover {
                 opacity: 0.7;
+            }
+            
+            .video_wrap {
+              position: absolute;
+              width: 100%;
+              top: 50%;
+              left: 0;
+              transform: translateY(-50%);
             }
         
           </style>
