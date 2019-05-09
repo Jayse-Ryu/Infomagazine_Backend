@@ -5,7 +5,6 @@ from .views import LandingViewSet
 
 router = routers.DefaultRouter()
 router.register('', LandingViewSet, base_name='landing')
-# router.register('', )
 
 urlpatterns = [
     path('api/', include(router.urls))

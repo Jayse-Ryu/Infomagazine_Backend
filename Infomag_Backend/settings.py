@@ -52,17 +52,10 @@ INSTALLED_APPS = [
 
     # Personal Apps
     'Users.apps.UsersConfig',
+    'UserAccess.apps.UseraccessConfig',
+    'Organization.apps.OrganizationConfig',
     'Company.apps.CompanyConfig',
     'Landing.apps.LandingConfig',
-    # 'Collection.apps.CollectionConfig',
-    # 'Files.apps.FilesConfig',
-    # 'Form.apps.FormConfig',
-    # 'Term.apps.TermConfig',
-    # 'Url.apps.UrlConfig',
-    # 'Video.apps.VideoConfig',
-    # 'Order.apps.OrderConfig',
-    'Organization.apps.OrganizationConfig',
-    'UserAccess.apps.UseraccessConfig',
 
     # AWS Management
     'storages'
