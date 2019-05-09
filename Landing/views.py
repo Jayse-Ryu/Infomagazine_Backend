@@ -71,7 +71,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         print('Retrieve function activated')
 
         sign_param = str(json.loads(kwargs['pk']))
-        # print(sign_param)
 
         session = boto3.session.Session(
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
@@ -231,7 +230,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 dynamo_obj.append(items)
 
                 else:
-                    print('staff has no search param')
                     # When search parameters not existed, get all of list
                     for item_company in init_company:
                         dynamo_db_res = \
@@ -489,13 +487,14 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         landing_form = landing['LandingInfo']['form']
         landing_field = landing['LandingInfo']['field']
         landing_order = landing['LandingInfo']['order']
+        order_lowest = 0
 
         temp = {
             'manager': 4,
             'manager_name': 'Manager2',
             'company': 4,
             'company_name': 'up2 customer',
-            'show_company': False,
+            # 'show_company': False,
             # 'name': 'mana2lan',
             # 'title': None,
 
@@ -610,6 +609,10 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         if len(landing_order) is not 0:
             order_obj = ''
             for order in landing_order:
+                # Get end of layout position for auto footer
+                if order['position']['y'] + order['position']['h'] > order_lowest:
+                    order_lowest = order['position']['y'] + order['position']['h']
+
                 # Order is image
                 if order['type'] is 1:
                     # order['image_url'], order['image_data']
@@ -663,7 +666,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         '''
                         for field in landing_field:
                             if field['form_group_id'] is order['form_group']:
-                                print('field item', field)
                                 if field['type'] is 1:
                                     # 1 text, name, holder, label(t,f)
                                     if field['label'] is True:
@@ -753,7 +755,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         '''
                                         for index, list_item in enumerate(field['list']):
                                             order_obj += f'''
-                                                <span>
+                                                <span style="white-space: nowrap;">
                                                   <input type="radio" 
                                                          value="{list_item}" 
                                                          name="radio_{field['sign']}" 
@@ -774,7 +776,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         '''
                                         for index, list_item in enumerate(field['list']):
                                             order_obj += f'''
-                                                <span>
+                                                <span style="white-space: nowrap;">
                                                   <input type="radio" 
                                                          value="{list_item}" 
                                                          name="radio_{field['sign']}" 
@@ -799,7 +801,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         '''
                                         for index, list_item in enumerate(field['list']):
                                             order_obj += f'''
-                                                <span>
+                                                <span style="white-space: nowrap;">
                                                   <input type="checkbox" 
                                                          value="{list_item}" 
                                                          name="radio_{field['sign']}" 
@@ -820,7 +822,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         '''
                                         for index, list_item in enumerate(field['list']):
                                             order_obj += f'''
-                                                <span>
+                                                <span style="white-space: nowrap;">
                                                   <input type="checkbox" 
                                                          value="{list_item}" 
                                                          name="radio_{field['sign']}" 
@@ -834,11 +836,9 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                               </div>
                                             </div>
                                         '''
-                                        print('field is chk')
 
                                 elif field['type'] is 6:
                                     # 6 date, ?
-                                    print('field is date')
                                     if field['label'] is True:
                                         order_obj += f'''
                                             <div class="field_wrap box_with_label" style="width: 100%;">
@@ -947,7 +947,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                             <span>[약관보기]</span>
                                         </div>
                                     '''
-                                    print('field is term chk')
 
                     order_obj += '''
                                 </div>
@@ -967,11 +966,8 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                  padding-bottom: {order['position']['h'] / 10}%;
                                  z-index: {order['position']['z']};">'''
 
-                    print('order[video_type] is ', order['video_type'])
-
                     if int(order['video_type']) is 1:
                         # Youtube
-                        print('im in youtube part')
                         order_obj += f'''
                             <div class="video_wrap">
                                 <div style=" position: relative; padding-bottom: 56.25%; height:0;">
@@ -987,7 +983,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         '''
                     elif int(order['video_type']) is 2:
                         # Vimeo
-                        print('im in vimeo part')
                         order_obj += f'''
                             <div class="video_wrap">
                                 <div style=" position: relative; padding-bottom: 56.25%; height:0;">
@@ -1004,30 +999,58 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     order_obj += '''
                         </section>
                     '''
-
-                print('order item is =', order)
-            # print('order_obj done is?', order_obj)
         else:
-            print('order len 0', landing_order)
+            print('There is no order in this landing', landing_order)
 
         if landing_info['show_company'] is True:
-            # print('if show company = get company = ', self.get_company(landing_info['company']))
-            company_obj = []
-            company_obj = json.dumps(str(self.get_company(landing_info['company'])))
-            # for item in self.get_company(landing_info['company']):
-            #     print('item is ', item)
-            # print('company_obj', company_obj)
-            # footer_obj = f'''
-            #
-            # '''
-            OrderedDict = (
-            [('id', 4), ('organization', 2), ('organization_name', 'Upche for 2'), ('name', 'up2 customer'),
-             ('sub_name', '\uc5c52 \uace0\uac1d'), ('header', 'kwm'),
-             ('address', '101, BUILDING 530, 301 JUNGDONG ST.\u3141\u3134\u3147\u3141\u3134\u3147'), ('corp_num', None),
-             ('phone', None), ('email', 'dgkim723@hotmail.com'), ('desc', None),
-             ('created_date', '2019-04-16T17:25:41.164827'), ('updated_date', '2019-04-16T17:25:41.164849')])
-            for item in OrderedDict:
-                print('order dict item ', item)
+            company_obj = json.loads(json.dumps(self.get_company(landing_info['company'])))
+
+            print('company obj is ', company_obj)
+
+            # Footer position below lowest order layout
+            if order_lowest is 0:
+                footer = '''
+                    <footer style="margin-top: 0;">
+                '''
+            else:
+                footer = f'''
+                    <footer style="margin-top: {order_lowest / 10}%;">
+                        <p class="footer_content">
+                '''
+
+            # Get company footer items and spread
+            footer_in = []
+            if company_obj['sub_name'] is not None:
+                footer_in.append(f"<span>{company_obj['sub_name']}</span>")
+            elif company_obj['name'] is not None:
+                footer_in.append(f"<span>{company_obj['name']}</span>")
+
+            if company_obj['header'] is not None:
+                footer_in.append(f"<span>{company_obj['header']}</span>")
+
+            if company_obj['phone'] is not None:
+                footer_in.append(f'''<a href="tel:{company_obj['phone']}"><span>{company_obj['phone']}</span></a>''')
+
+            if company_obj['email'] is not None:
+                footer_in.append(f'''<a href="mailto:{company_obj['email']}"><span>{company_obj['email']}</span></a>''')
+
+            if company_obj['corp_num']:
+                footer_in.append(f'''<span>{company_obj['corp_num']}</span>''')
+
+            if company_obj['address'] is not None:
+                footer_in.append(f'''<span>{company_obj['address']}</span>''')
+
+            # Spread
+            for index, item in enumerate(footer_in):
+                footer += item
+                if index < len(footer_in)-1:
+                    footer += ' | '
+
+            footer += '''
+                </footer>
+            '''
+        else:
+            footer = ''
 
         # ## Header CSS with font import
         style_sheet = '''
@@ -1064,6 +1087,18 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               position: absolute;
               width: 100%;
             }
+            
+            a {
+              background-color: transparent;
+              text-decoration: none !important;
+              color: unset;
+            }
+        
+            a:active,
+            a:hover {
+              outline: 0 !important;
+            }
+        
             /* /Main */
         
             /* Responsive Wrap */
@@ -1093,7 +1128,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         
         
             /* Layout Initial */
-            section {
+            section, footer {
               position: absolute;
               width: 100%;
             }
@@ -1102,6 +1137,18 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               width: 100%;
               height: 100%;
               overflow: auto;
+            }
+            
+            footer {
+              padding: 3%;
+              text-align: center;
+              font-size: 0.9em;
+              background-color: #f5f5f5;
+            }
+            
+            footer p span {
+              word-break: keep-all;
+              white-space: nowrap;
             }
         
             .form_wrap {
@@ -1294,9 +1341,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     <div class="overall_wrap">
                         {order_obj}
             
-                        <footer>
-                        
-                        </footer>
+                        {footer}
                     </div> <!-- /div overall wrap -->
                 </main>
             
@@ -1312,7 +1357,6 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         preview_html = open('./temp.html', 'w')
         preview_html.write(contents)
-        # print('preview html is ', open('./temp.html').read())
         preview_html.close()
 
 
