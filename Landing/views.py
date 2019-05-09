@@ -1321,6 +1321,12 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
           </style>
         '''
 
+        form_submit = '''
+            function form_submit() {
+                console.log('test');
+            }
+        '''
+
         # ## Render HTML file
         contents = f'''
             <!DOCTYPE html>
@@ -1349,6 +1355,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 <script>
                     {hijack}
                     {body_script}
+                    {form_submit}
                 </script>
                 <!-- /Body script -->
             </body>
