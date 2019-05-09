@@ -764,6 +764,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                             }
                             tx_color = form['tx_color'].lstrip('#')
                             opacity = int(form['opacity']) / 10
+                            form_collector = ''
                             break
 
                     if form_exist_flag is True:
@@ -776,7 +777,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      z-index: {order['position']['z']};
                                      background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
                                      color: #{tx_color};">
-                                <form onsubmit = "event.preventDefault(); form_submit();">
+                                <form onsubmit = "event.preventDefault(); form_submit({order['form_group']});">
                                     <div class="form_wrap">
                         '''
                         for field in landing_field:
@@ -1439,8 +1440,13 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             '''
 
         form_submit = '''
-                function form_submit() {
+                function form_submit(group) {
                     console.log('test');
+                    console.log('form_group number is ', group);
+                    
+                    if (document.getElementById('form_(group)_sign').value == '') {
+                        alert('(name)'의 );
+                    }
                 }
             '''
 
