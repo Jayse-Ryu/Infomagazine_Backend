@@ -740,7 +740,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                     order_obj += '''
                             <figure>
-                              <img src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" alt="Top_bg_big">
+                              <img 
+                                src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" 
+                                alt="Top_bg_big">
                             </figure>
                         '''
 
@@ -766,19 +768,17 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                     if form_exist_flag is True:
                         order_obj += f'''
-                                <section id="section_{order['sign']}" 
-                                         style="margin-top: {order['position']['y'] / 10}%; 
-                                         left: {order['position']['x'] / 10}%; 
-                                         width: {order['position']['w'] / 10}%; 
-                                         padding-bottom: {order['position']['h'] / 10}%;
-                                         z-index: {order['position']['z']};
-                                         background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color[
-                            'b']},{opacity});
-                                         color: #{tx_color};
-                                         font-family: {landing_info['font']};">
-                                    <form onsubmit = "event.preventDefault(); form_submit();">
-                                        <div class="form_wrap">
-                            '''
+                            <section id="section_{order['sign']}" 
+                                     style="margin-top: {order['position']['y'] / 10}%; 
+                                     left: {order['position']['x'] / 10}%; 
+                                     width: {order['position']['w'] / 10}%; 
+                                     padding-bottom: {order['position']['h'] / 10}%;
+                                     z-index: {order['position']['z']};
+                                     background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
+                                     color: #{tx_color};">
+                                <form onsubmit = "event.preventDefault(); form_submit();">
+                                    <div class="form_wrap">
+                        '''
                         for field in landing_field:
                             if field['form_group_id'] is order['form_group']:
                                 if field['type'] is 1:
@@ -1123,8 +1123,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         if landing_info['show_company'] is True:
             company_obj = json.loads(json.dumps(self.get_company(landing_info['company'])))
-
-            print('company obj is ', company_obj)
 
             # Footer position below lowest order layout
             if order_lowest is 0:
@@ -1484,3 +1482,21 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         preview_html = open('./temp.html', 'w')
         preview_html.write(contents)
         preview_html.close()
+
+        session = boto3.session.Session(
+            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            # aws_session_token=config('AWS_SESSION_TOKEN'),
+            region_name='ap-northeast-2'
+        )
+
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            region_name='ap-northeast-2'
+        )
+
+        # s3 = session.resource('s3')
+        # s3 = boto3.client('s3')
+        s3.upload_file('./temp.html', 'lcventures-web', f'''preview_{landing_num}.html''')
