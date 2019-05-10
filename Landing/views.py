@@ -497,6 +497,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         print('args', args, kwargs)
         req = json.loads(request.body)
 
+        # Get temporary dynamo db for preview html
         self.create_html(req)
 
         return Response(status=status.HTTP_200_OK)
@@ -787,11 +788,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                                 <div class="field_wrap box_with_label" style="width: 100%;">
-                                                  <label class="field_label" for="{field['name']}{field['sign']}">
+                                                  <label class="field_label" for="form_{order['sign']}_{field['sign']}">
                                                       {field['name']}
                                                   </label>
                                                   <input type="text" 
-                                                         id="{field['name']}{field['sign']}" 
+                                                         id="form_{order['sign']}_{field['sign']}" 
                                                          placeholder="{field['holder']}"
                                                          maxlength="25">
                                                 </div>
@@ -800,7 +801,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         order_obj += f'''
                                                 <div class="field_wrap box_without_label" style="width: 100%;">
                                                   <input type="text" 
-                                                         id="{field['name']}{field['sign']}" 
+                                                         id="form_{order['sign']}_{field['sign']}" 
                                                          placeholder="{field['holder']}"
                                                          maxlength="25">
                                                 </div>
@@ -810,11 +811,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                                 <div class="field_wrap box_with_label" style="width: 100%;">
-                                                  <label class="field_label" for="{field['name']}{field['sign']}">
+                                                  <label class="field_label" for="form_{order['sign']}_{field['sign']}">
                                                       {field['name']}
                                                   </label>
                                                   <input type="number" 
-                                                         id="{field['name']}{field['sign']}" 
+                                                         id="form_{order['sign']}_{field['sign']}" 
                                                          placeholder="{field['holder']}"
                                                          maxlength="25">
                                                 </div>
@@ -823,7 +824,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         order_obj += f'''
                                                 <div class="field_wrap box_without_label" style="width: 100%;">
                                                   <input type="number" 
-                                                         id="{field['name']}{field['sign']}" 
+                                                         id="form_{order['sign']}_{field['sign']}" 
                                                          placeholder="{field['holder']}"
                                                          maxlength="25">
                                                 </div>
@@ -833,10 +834,10 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                             <div class="field_wrap box_with_label" style="width: 100%;">
-                                              <label class="field_label" for="{field['name']}{field['sign']}">
+                                              <label class="field_label" for="form_{order['sign']}_{field['sign']}">
                                                   {field['name']}
                                               </label>
-                                              <select id="{field['name']}{field['sign']}">
+                                              <select id="form_{order['sign']}_{field['sign']}">
                                                 <option value="0">{field['holder']}</option>
                                             '''
                                         for list_item in field['list']:
@@ -850,7 +851,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     else:
                                         order_obj += f'''
                                             <div class="field_wrap box_without_label" style="width: 100%;">
-                                              <select id="{field['name']}{field['sign']}">
+                                              <select id="form_{order['sign']}_{field['sign']}">
                                                 <option value="0">{field['holder']}</option>
                                             '''
                                         for list_item in field['list']:
@@ -875,9 +876,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                       <input type="radio" 
                                                              value="{list_item}" 
                                                              name="radio_{field['sign']}" 
-                                                             id="{field['name']}{field['sign']}{index}">
-                                                      <label class="list_label" for="{field['name']}{field[
-                                                'sign']}{index}">
+                                                             id="form_{order['sign']}_{field['sign']}_{index}">
+                                                      <label class="list_label" 
+                                                             for="form_{order['sign']}_{field['sign']}_{index}">
                                                         {list_item}
                                                       </label>
                                                     </span>
@@ -897,9 +898,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                       <input type="radio" 
                                                              value="{list_item}" 
                                                              name="radio_{field['sign']}" 
-                                                             id="{field['name']}{field['sign']}{index}">
-                                                      <label class="list_label" for="{field['name']}{field[
-                                                'sign']}{index}">
+                                                             id="form_{order['sign']}_{field['sign']}_{index}">
+                                                      <label class="list_label" 
+                                                             for="form_{order['sign']}_{field['sign']}_{index}">
                                                         {list_item}
                                                       </label>
                                                     </span>
@@ -923,9 +924,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                       <input type="checkbox" 
                                                              value="{list_item}" 
                                                              name="radio_{field['sign']}" 
-                                                             id="{field['name']}{field['sign']}{index}">
-                                                      <label class="list_label" for="{field['name']}{field[
-                                                'sign']}{index}">
+                                                             id="form_{order['sign']}_{field['sign']}_{index}">
+                                                      <label class="list_label" 
+                                                             for="form_{order['sign']}_{field['sign']}_{index}">
                                                         {list_item}
                                                       </label>
                                                     </span>
@@ -945,9 +946,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                       <input type="checkbox" 
                                                              value="{list_item}" 
                                                              name="radio_{field['sign']}" 
-                                                             id="{field['name']}{field['sign']}{index}">
-                                                      <label class="list_label" for="{field['name']}{field[
-                                                'sign']}{index}">
+                                                             id="form_{order['sign']}_{field['sign']}_{index}">
+                                                      <label class="list_label" 
+                                                             for="form_{order['sign']}_{field['sign']}_{index}">
                                                         {list_item}
                                                       </label>
                                                     </span>
@@ -962,11 +963,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     if field['label'] is True:
                                         order_obj += f'''
                                                 <div class="field_wrap box_with_label" style="width: 100%;">
-                                                  <label class="field_label" for="{field['name']}{field['sign']}">
+                                                  <label class="field_label" for="form_{order['sign']}_{field['sign']}">
                                                       {field['name']}
                                                   </label>
                                                   <input type="date" 
-                                                         id="{field['name']}{field['sign']}" 
+                                                         id="form_{order['sign']}_{field['sign']}" 
                                                          placeholder="{field['holder']}">
                                                 </div>
                                             '''
@@ -974,7 +975,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         order_obj += f'''
                                                 <div class="field_wrap box_without_label" style="width: 100%;">
                                                   <input type="date" 
-                                                         id="{field['name']}{field['sign']}" 
+                                                         id="form_{order['sign']}_{field['sign']}" 
                                                          placeholder="{field['holder']}">
                                                 </div>
                                             '''
@@ -1060,13 +1061,59 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                                 elif field['type'] is 10:
                                     # 10 term chk
-                                    order_obj += f'''
-                                            <div class="field_wrap term_wrap" style="width: 100%;">
-                                                <input type="checkbox" id="term{field['sign']}">
-                                                <label for="term{field['sign']}">{field['holder']}</label>
-                                                <span>[약관보기]</span>
+                                    if field['label'] is True:
+                                        order_obj += f'''
+                                                <div class="field_wrap list_with_label" style="width: 100%;">
+                                                  <label class="field_label">{field['name']}</label>
+                                                  <div class="list_wrap">
+                                            '''
+                                        order_obj += f'''
+                                                <span style="white-space: nowrap;">
+                                                  <input type="checkbox" 
+                                                         value="true" 
+                                                         id="form_{order['sign']}_{field['sign']}">
+                                                  <label class="list_label" for="form_{order['sign']}_{field['sign']}">
+                                                    {field['holder']}
+                                                  </label>'''
+
+                                        if landing_info['is_term'] is True:
+                                            order_obj += f'''
+                                                <button class="term_button" type="button" id="show_term">
+                                                    [{field['name']}]
+                                                </button>
+                                            '''
+
+                                        order_obj += '''
+                                                </span>
+                                              </div>
                                             </div>
-                                        '''
+                                            '''
+
+                                    else:
+                                        order_obj += f'''
+                                                <div class="field_wrap list_without_label" style="width: 100%;">
+                                                  <div class="list_wrap" style="text-align: right;">
+                                            '''
+                                        order_obj += f'''
+                                                <span style="white-space: nowrap;">
+                                                  <input type="checkbox" 
+                                                         value="true" 
+                                                         id="form_{order['sign']}_{field['sign']}">
+                                                  <label class="list_label" for="form_{order['sign']}_{field['sign']}">
+                                                    {field['holder']}
+                                                  </label>'''
+
+                                        if landing_info['is_term'] is True:
+                                            order_obj += f'''
+                                                <button class="term_button" type="button">
+                                                    [{field['name']}]
+                                                </button>
+                                            '''
+                                        order_obj += '''
+                                                </span>
+                                              </div>
+                                            </div>
+                                            '''
 
                     order_obj += '''
                                     </div>
@@ -1122,6 +1169,62 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         else:
             print('There is no order in this landing', landing_order)
 
+        if landing_info['is_term'] is True:
+            if landing_info['image_term'] is True:
+                term_obj = f'''
+                <section class="term_bg" id="term_bg">
+                    <div id="term" class="term">
+                        <div class="term_header">
+                            <div class="term_title">
+                                약관
+                            </div>
+                            <div class="term_close" id="term_close">&times;</div>
+                        </div>
+                        <div class="term_content">
+                            <figure>
+                                <img 
+                                    src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" 
+                                    alt="Top_bg_big">
+                            </figure>
+                        </div>
+                    </div>
+                </section>
+                '''
+            else:
+                term_obj = f'''
+                <section class="term_bg" id="term_bg">
+                    <div id="term" class="term">
+                        <div class="term_header">
+                            <div class="term_title">
+                                {landing_term['title']}
+                            </div>
+                            <div class="term_close" id="term_close">&times;</div>
+                        </div>
+                        <div class="term_content">
+                            <pre>
+                                {landing_term['content']}
+                            </pre>
+                        </div>
+                    </div>
+                </section>
+                '''
+
+            term_script = '''
+            // Show term element.
+            document.getElementById('show_term').addEventListener('click', function() {
+                $("#term_bg").css('visibility', 'visible');
+            });
+            document.getElementById('term_bg').addEventListener('click', function() {
+                $("#term_bg").css('visibility', 'hidden');
+            });
+            document.getElementById('term_close').addEventListener('click', function() {
+                $("#term_bg").css('visibility', 'hidden');
+            });
+            '''
+        else:
+            term_obj = ''
+            term_script = ''
+
         if landing_info['show_company'] is True:
             company_obj = json.loads(json.dumps(self.get_company(landing_info['company'])))
 
@@ -1144,7 +1247,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 footer_in.append(f"<span>{company_obj['name']}</span>")
 
             if company_obj['header'] is not None:
-                footer_in.append(f"<span>{company_obj['header']}</span>")
+                footer_in.append(f"<span>대표자 : {company_obj['header']}</span>")
 
             if company_obj['phone'] is not None:
                 footer_in.append(f'''<a href="tel:{company_obj['phone']}"><span>{company_obj['phone']}</span></a>''')
@@ -1153,7 +1256,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 footer_in.append(f'''<a href="mailto:{company_obj['email']}"><span>{company_obj['email']}</span></a>''')
 
             if company_obj['corp_num']:
-                footer_in.append(f'''<span>{company_obj['corp_num']}</span>''')
+                footer_in.append(f'''<span>사업자등록번호 : {company_obj['corp_num']}</span>''')
 
             if company_obj['address'] is not None:
                 footer_in.append(f'''<span>{company_obj['address']}</span>''')
@@ -1265,20 +1368,25 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 }
 
                 footer p span {
+                  color: #212121;
                   word-break: keep-all;
                   white-space: nowrap;
+                }
+
+                .footer_content {
+                  color: #bbbbbb;
                 }
 
                 .form_wrap {
                   position: absolute;
                   width: 100%;
                   padding: 3%;
-                  top: 50%;
+                  /* top: 50%;
                   -webkit-transform: translateY(-50%);
                   -moz-transform: translateY(-50%);
                   -ms-transform: translateY(-50%);
                   -o-transform: translateY(-50%);
-                  transform: translateY(-50%);
+                  transform: translateY(-50%); */
                 }
 
                 @media (max-width: 1000px) {
@@ -1313,7 +1421,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                   text-align: center;
                   margin-top: 0.5rem;
                   padding-top: calc(.25rem - 2px);
-                  padding-bottom: calc(.25rem + 1px);
+                  /*padding-bottom: calc(.25rem + 1px);*/
                   font-size: .875rem;
                   line-height: 1.5;
                 }
@@ -1385,7 +1493,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                   .box_with_label label {
                     width: 100%;
                     display: inline-block;
-                    margin-bottom: 0.5rem;
+                    /*margin-bottom: 0.5rem;*/
                     text-align: left;
                   }
                   .box_with_label input, .box_with_label select {
@@ -1436,6 +1544,80 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                   transform: translateY(-50%);
                 }
 
+                .term_button {
+                    font-size: .875rem;
+                    background-color: transparent;
+                    font-weight: 400;
+                    color: #007bff;
+                    border: none;
+                    cursor: pointer;
+                }
+
+                .term_bg {
+                    visibility: hidden;
+                    position: fixed;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    background: rgba(0,0,0,0.4);
+                    z-index: 990;
+                    transition: 200ms visibility ease-in-out;
+                    cursor: pointer;
+                }
+        
+                .term {
+                    position: relative;
+                    width: 80%;
+                    height: 80%;
+                    margin: auto;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: #ffffff;
+                    border-radius: 8px;
+                    overflow: auto;
+                }
+        
+                .term_header {
+                    position: fixed;
+                    width: 100%;
+                    height: 50px;
+                    background: #ffffff;
+                    border-bottom: 2px solid #777777;
+                }
+        
+                .term_title {
+                    display: inline-block;
+                    font-size: 20px;
+                    padding: 15px 15px;
+                    width: calc(100% - 100px);
+                    vertical-align: top;
+                }
+        
+                .term_close {
+                    display: inline-block;
+                    width: 50px;
+                    font-size: 45px;
+                    vertical-align: top;
+                    text-align: center;
+                    cursor: pointer;
+                }
+        
+                .term_content{
+                    position: relative;
+                    margin-top: 50px;
+                    padding: 20px;
+                    box-sizing: border-box;
+                    width: 100%;
+                    height: 100%;
+                    font-size: 14px;
+                    overflow: auto;
+                }
+        
+                .term_content pre {
+                    white-space: pre-line;
+                }
+
               </style>
             '''
 
@@ -1467,17 +1649,20 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 </head>
                 <body>
                     <main>
+                        <!-- div overall wrap -->
                         <div class="overall_wrap">
                             {order_obj}
-
+                            {term_obj}
                             {footer}
-                        </div> <!-- /div overall wrap -->
+                        </div>
+                        <!-- /div overall wrap -->
                     </main>
 
                     <!-- Body script -->
                     <script>
                         {hijack}
                         {body_script}
+                        {term_script}
                         {form_submit}
                     </script>
                     <!-- /Body script -->
