@@ -1068,7 +1068,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   <div class="list_wrap">
                                             '''
                                         order_obj += f'''
-                                                <span style="white-space: nowrap;">
+                                                <span>
                                                   <input type="checkbox" 
                                                          value="true" 
                                                          id="form_{order['sign']}_{field['sign']}">
@@ -1095,7 +1095,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   <div class="list_wrap" style="text-align: right;">
                                             '''
                                         order_obj += f'''
-                                                <span style="white-space: nowrap;">
+                                                <span>
                                                   <input type="checkbox" 
                                                          value="true" 
                                                          id="form_{order['sign']}_{field['sign']}">
@@ -1105,7 +1105,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                                         if landing_info['is_term'] is True:
                                             order_obj += f'''
-                                                <button class="term_button" type="button">
+                                                <button class="term_button" type="button" id="show_term">
                                                     [{field['name']}]
                                                 </button>
                                             '''
@@ -1181,7 +1181,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                             <div class="term_close" id="term_close">&times;</div>
                         </div>
                         <div class="term_content">
-                            <figure>
+                            <figure style="position: relative;">
                                 <img 
                                     src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" 
                                     alt="Top_bg_big">
@@ -1212,13 +1212,16 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             term_script = '''
             // Show term element.
             document.getElementById('show_term').addEventListener('click', function() {
-                $("#term_bg").css('visibility', 'visible');
+                // $("#term_bg").css('visibility', 'visible');
+                document.getElementById('term_bg').style.visibility = 'visible';
             });
             document.getElementById('term_bg').addEventListener('click', function() {
-                $("#term_bg").css('visibility', 'hidden');
+                // $("#term_bg").css('visibility', 'hidden');
+                document.getElementById('term_bg').style.visibility = 'hidden';
             });
             document.getElementById('term_close').addEventListener('click', function() {
-                $("#term_bg").css('visibility', 'hidden');
+                // $("#term_bg").css('visibility', 'hidden');
+                document.getElementById('term_bg').style.visibility = 'hidden';
             });
             '''
         else:
@@ -1570,6 +1573,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     position: relative;
                     width: 80%;
                     height: 80%;
+                    max-width: 1000px;
+                    min-width: 340px;
                     margin: auto;
                     top: 50%;
                     transform: translateY(-50%);
@@ -1590,7 +1595,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     display: inline-block;
                     font-size: 20px;
                     padding: 15px 15px;
-                    width: calc(100% - 100px);
+                    width: calc(100% - 65px);
                     vertical-align: top;
                 }
         
@@ -1627,7 +1632,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     console.log('form_group number is ', group);
                     
                     if (document.getElementById('form_(group)_sign').value == '') {
-                        alert('(name)'의 );
+                        alert('(name)');
                     }
                 }
             '''
