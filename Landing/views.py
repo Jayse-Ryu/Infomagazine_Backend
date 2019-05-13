@@ -1706,4 +1706,4 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # s3 = session.resource('s3')
         # s3 = boto3.client('s3')
-        s3.upload_file('./temp.html', 'lcventures-web', f'''preview_{landing_num}.html''')
+        s3.upload_file('./temp.html', 'infomagazine', f'''landings/{landing_num}_preview.html''')
