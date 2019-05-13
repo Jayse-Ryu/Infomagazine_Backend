@@ -131,6 +131,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         auth = self.request.query_params.get('auth', None)
         auth_code = self.request.query_params.get('auth_code', None)
         main = self.request.query_params.get('main', None)
+        auto = self.request.query_params.get('auto', None)
 
         # Search params
         manager = self.request.query_params.get('manager', None)
@@ -389,8 +390,18 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # Add company name and manager name in list
         final_result = []
-        for tem in dynamo_obj:
-            if tem['LandingInfo']['landing']['name'] is not None:
+        if auto is None:
+            for tem in dynamo_obj:
+                if tem['LandingInfo']['landing']['name'] is not None:
+                    get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
+                    get_company = self.get_company(tem['LandingInfo']['landing']['company'])['name']
+                    collection_amount = len(tem['LandingInfo']['landing']['collections'])
+                    tem['LandingInfo']['landing']['manager_name'] = get_manger
+                    tem['LandingInfo']['landing']['company_name'] = get_company
+                    tem['LandingInfo']['landing']['collection_amount'] = collection_amount
+                    final_result.append(tem)
+        else:
+            for tem in dynamo_obj:
                 get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
                 get_company = self.get_company(tem['LandingInfo']['landing']['company'])['name']
                 collection_amount = len(tem['LandingInfo']['landing']['collections'])
@@ -1631,9 +1642,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     console.log('test');
                     console.log('form_group number is ', group);
                     
-                    if (document.getElementById('form_(group)_sign').value == '') {
-                        alert('(name)');
-                    }
+                    // if (document.getElementById('form_(group)_sign').value == '') {
+                    //     alert('(name)');
+                    // }
                 }
             '''
 
